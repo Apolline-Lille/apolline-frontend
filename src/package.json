@@ -1,0 +1,15 @@
+{
+  "name": "apolline-frontend",
+  "version": "0.0.1",
+  "description": "",
+  "author": "Arthur Baldeck <arthur.baldeck04@gmail.com>",
+  "main": "server.js",
+  "scripts": {
+    "start": "npm install && nodemon -L server.js"
+  },
+  "dependencies": {
+    "express": "^4.13.3",
+    "mongoose": "^4.6.5",
+    "nodemon": "^1.9.2"
+  }
+}
