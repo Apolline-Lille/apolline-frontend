@@ -1,8 +1,17 @@
-FROM node:latest
-MAINTAINER Arthur Baldeck <arthur.baldeck04@gmail.com>
+# Node.js version
+FROM node:6.9.2
+
+# Create app directory
+RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
-COPY src/package.json ./
+
+# get the npm modules that need to be installed
+COPY package.json /usr/src/app/
+
+# install npm modules
 RUN npm install
-COPY . .
-EXPOSE 8080
-CMD [ "npm", "start" ]
+
+# copy the source files from host to container
+COPY . /usr/src/app
+
+CMD [ "node", "index.js" ]

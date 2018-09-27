@@ -1,16 +1,8 @@
 version: '2'
 services:
-  mongodb:
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-  web:
-    image: node:latest
+  apolline-frontend:
+    build: .
+    image: apolline-frontend
+    command: nodemon index.js
     volumes:
-      - ./src:/usr/src
-    working_dir: /usr/src
-    command: npm start
-    ports:
-      - '3000:3000'
-    links:
-      - mongodb
+      - .:/usr/src/app

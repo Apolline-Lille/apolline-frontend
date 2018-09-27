@@ -1,0 +1,19 @@
+{
+  "name": "apolline-frontend",
+  "version": "1.0.0",
+  "description": "This is a starter pack for using docker-compose with a Node and MongoDB based application.  It is not meant for production, but could easily be properly prepared for that purpose.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Apolline-Lille/apolline-frontend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Apolline-Lille/apolline-frontend/issues"
+  },
+  "homepage": "https://github.com/Apolline-Lille/apolline-frontend#readme"
+}

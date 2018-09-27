@@ -1,3 +1,6 @@
+# Tutorial attended
+https://github.com/shaunpersad/docker-tutorial
+
 # Docker-Compose with Node and Mongo Starter Pack
 This is a starter pack for using docker-compose with a Node and MongoDB based application. 
 It is not meant for production, but could easily be properly prepared for that purpose. 
