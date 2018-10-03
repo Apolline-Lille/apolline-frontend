@@ -41,3 +41,18 @@ making to solidify your docker knowledge:
 Note: DO NOT go to production without setting up a user and password for your mongo container. 
 Having insecured data like that is both irresponsible and dangerous. DO NOT USE THIS IN PRODUCTION unless you 
 have specified user credentials. 
+
+### Creation of the docker image
+Go to the directory meanjs in the apolline-frontend app:
+```
+$ cd apolline-frontend/meanjs
+```
+
+You have to build the docker image:
+```
+$ docker build -t meanjs .
+```
+And finally you can run the docker compose to launch the app and go to the http://localhost:3000/ to see it:
+```
+$ docker-compose up
+```
