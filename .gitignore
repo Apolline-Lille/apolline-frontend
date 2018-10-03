@@ -58,18 +58,19 @@ typings/
 # MEAN.js app and assets
 # ======================
 public/dist/
-uploads
-modules/users/client/img/profile/uploads
-config/env/local.js
-config/env/local-*.js
-*.pem
+meanjs/dbpath/
+meanjs/uploads
+meanjs/modules/users/client/img/profile/uploads
+meanjs/config/env/local.js
+meanjs/config/env/local-*.js
+meanjs/*.pem
 
 # Optional npm cache directory
 .npm
 # Compiled less and sass files
 # ============================
-modules/*/client/scss/*.css
-modules/*/client/less/*.css
+meanjs/modules/*/client/scss/*.css
+meanjs/modules/*/client/less/*.css
 
 # Optional eslint cache
 .eslintcache
