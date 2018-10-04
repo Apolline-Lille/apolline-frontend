@@ -11,7 +11,7 @@ FROM ubuntu:18.04
 MAINTAINER MEAN.JS
 
 # 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
-EXPOSE 80 443 3000 35729 8080
+EXPOSE 3000 443 80 35729 8080
 
 # Set development environment as default
 ENV NODE_ENV development
