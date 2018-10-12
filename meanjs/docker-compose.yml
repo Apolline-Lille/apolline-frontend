@@ -34,7 +34,7 @@ services:
   db-data:
     image: mongo:3.2
     volumes:
-      - /data/db
+      - /DataDir:/data/db
       - /var/lib/mongodb
       - /var/log/mongodb
     entrypoint: /bin/true
