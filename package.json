@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/Apolline-Lille/apolline-frontend/issues"
   },
-  "homepage": "https://github.com/Apolline-Lille/apolline-frontend#readme"
+  "homepage": "https://github.com/Apolline-Lille/apolline-frontend#readme",
+  "dependencies": {
+    "influx": "^5.0.7"
+  }
 }
