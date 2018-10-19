@@ -1,0 +1,62 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "API REST apolline-frontend",
+    "description": "API REST apolline-frontend",
+    "termsOfService": "terms",
+    "contact": {
+      "name": "Arthur Baldeck",
+      "url": "https://github.com/Apolline-Lille/apolline-frontend",
+      "email": "arthur.baldeck04@gmail.com"
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "host": "apolline.lille.inria.fr",
+  "basePath": "/",
+  "paths": {
+    "/{pathparam}/data": {
+      "get": {
+        "tags": [
+          "apolline.science"
+        ],
+        "summary": "data content in pathparam",
+        "description": "return the data from the database pathparam",
+        "produces": [
+          "text/csv"
+        ],
+        "parameters": [
+          {
+            "name": "pathparam",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "name of the db choosen"
+          }
+        ],
+        "responses": {
+          "100": {
+            "description": "Waiting for the end of the request"
+          },
+          "201": {
+            "description": "return the data csv file"
+          },
+          "204": {
+            "description": "no content return"
+          },
+          "400": {
+            "description": "wrong request"
+          },
+          "404": {
+            "description": "unable to connect to the db"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    }
+  }
+}
