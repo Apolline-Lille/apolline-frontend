@@ -1,0 +1,61 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "1.0.0",
+    "title": "API REST apolline-frontend",
+    "description": "API REST apolline-frontend",
+    "termsOfService": "terms",
+    "contact": {
+      "name": "Arthur Baldeck",
+      "url": "https://github.com/Apolline-Lille/apolline-frontend"
+    }
+  },
+  "schemes": [
+    "http"
+  ],
+  "host": "apolline.science",
+  "basePath": "/",
+  "paths": {
+    "/measurments/{campaign}": {
+      "get": {
+        "tags": [
+          "apolline.science"
+        ],
+        "summary": "Get all the data of the DataBase \"campaign\"",
+        "description": "Return the whole database choosen \"campaign\" in a CSV file",
+        "produces": [
+          "text/csv"
+        ],
+        "parameters": [
+          {
+            "name": "campaign",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "description": "name of the database choosen"
+          }
+        ],
+        "responses": {
+          "100": {
+            "description": "Waiting for the end of the file creation"
+          },
+          "201": {
+            "description": "return the data CSV file"
+          },
+          "204": {
+            "description": "there is no content in the database you choose"
+          },
+          "400": {
+            "description": "wrong request"
+          },
+          "404": {
+            "description": "Page not found"
+          },
+          "500": {
+            "description": "internal server error"
+          }
+        }
+      }
+    }
+  }
+}

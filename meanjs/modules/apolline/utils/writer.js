@@ -1,18 +1,18 @@
-var ResponsePayload = function(code, payload) {
+var ResponsePayload = function(code, value) {
     this.code = code;
-    this.payload = payload;
+    this.value = value;
   }
   
-  exports.respondWithCode = function(code, payload) {
-    return new ResponsePayload(code, payload);
+  exports.respondWithCode = function(code, value) {
+    return new ResponsePayload(code, value);
   }
   
-  var writeJson = exports.writeJson = function(response, arg1, arg2) {
+  var writeCSV = exports.writeCSV = function(response, arg1, arg2) {
     var code;
-    var payload;
+    var value;
   
     if(arg1 && arg1 instanceof ResponsePayload) {
-      writeJson(response, arg1.payload, arg1.code);
+      writeCSV(response, arg1.value, arg1.code);
       return;
     }
   
@@ -25,10 +25,10 @@ var ResponsePayload = function(code, payload) {
       }
     }
     if(code && arg1) {
-      payload = arg1;
+      value = arg1;
     }
     else if(arg1) {
-      payload = arg1;
+      value = arg1;
     }
   
     if(!code) {
@@ -36,8 +36,12 @@ var ResponsePayload = function(code, payload) {
       code = 200;
     }
     if(typeof payload === 'object') {
-      payload = JSON.stringify(payload, null, 2);
+        const opts = {value};
+        const parser = new Json2csvParser(opts);
+        const csv = parser.parse(value);
+        console.log(csv);
+        //value = JSON.stringify(value, null, 2);
     }
     response.writeHead(code, {'Content-Type': 'application/json'});
-    response.end(payload);
+    response.end(csv);
   }
