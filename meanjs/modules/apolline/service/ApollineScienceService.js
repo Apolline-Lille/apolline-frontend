@@ -6,45 +6,62 @@
  * campaign String name of the database choosen
  * no response value expected for this operation
  **/
+const Influx = require('influx'); 
+var jsonexport = require('jsonexport');
+const os = require('os')
+var nbCallback = 0;
+var listMeasurements = new Array();
+
+
 exports.measurementsCampaignGET = function(campaign) {
-  const Influx = require('influx'); 
-  var jsonexport = require('jsonexport');
-  console.log("campaign = "+ campaign);
-  const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
-  console.log(influx);
-  /*influx.query('select * from humidity').then( result => {
-    console.log(result)
-  })*/
-  console.log("new request");
-  console.log("\n");
-  influx.getSeries({
-    measurement: "humidity",
-    database: campaign
-  }).then(names => {
-    console.log('My series names in my_measurement are: ' + names.join(', '))
-  }).catch(function(names){
-    console.log("first catch");
-    console.log(names);
+  getAllMeasurements(campaign, function(){
+    var dataTable = new Array();
+    getDataFromMeasurements(campaign);
   });
-  
-  /*influx.getSeries()
-    .then(names => {
-      console.log("names = "+names);
-      console.log("data = "+data);
-      names.then(function(result){
-        jsonexport(result, function(err, csv){
-          if(err) return console.log(err);
-          console.log(csv);
-        });
-      });
-    })
-    .catch(function(response){
-      console.log("it's ok!");
-      console.log(response);
-    });*/
-  
-  
+
   return new Promise(function(resolve, reject) {
     resolve();
   });
 }
+
+
+function getAllMeasurements(campaign, callback){
+  const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
+  var measurements;
+  influx.getMeasurements().then( results => {
+    listMeasurements = results;
+    callback();
+  }).catch(err => {
+    console.log(err);
+  })
+}
+
+function getDataFromMeasurements(campaign){
+  listMeasurements.forEach(function(measurement){
+    getDataFromMeasurement(measurement, campaign);
+  }); 
+}
+
+function getDataFromMeasurement(measurement,campaign){
+  const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
+  influx.query(`
+    select * from ` + measurement + `
+    where host = ${Influx.escape.stringLit(os.hostname())}
+    order by time desc
+    limit 10
+    `).then( results => {
+      receiveCall(results)
+  }).catch(err => {
+    console.log("salut salut c'est tout nul");
+  });
+}
+
+//add element to dataTable
+function receiveCall(results){
+  dataTable.push(results);
+  if (dataTable.length == listMeasurements.length){
+    console.log("Nombre de mesure ok");
+  }
+}
+
+
