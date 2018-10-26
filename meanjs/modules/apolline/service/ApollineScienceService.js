@@ -45,14 +45,15 @@ function getDataFromMeasurements(campaign){
 function getDataFromMeasurement(measurement,campaign){
   const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
   influx.query(`
-    select * from ` + measurement + `
+    select * from ` + Influx.escape.stringLit(measurement) + `
     where host = ${Influx.escape.stringLit(os.hostname())}
     order by time desc
     limit 10
     `).then( results => {
-      receiveCall(results)
+      console.log(results);
+      //receiveCall(results)
   }).catch(err => {
-    console.log("salut salut c'est tout nul");
+    console.log(err);
   });
 }
 
