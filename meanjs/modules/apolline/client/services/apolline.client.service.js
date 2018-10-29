@@ -1,4 +1,11 @@
 'use strict';
+var http = require('http');
+const Influx = require('influx'); 
+var jsonexport = require('jsonexport/dist');
+var fs = require('fs');
+
+const apiApolline = 'http://apolline.lille.inria.fr:8086/';
+
 /**
  * Get all the data of the DataBase \"campaign\"
  * Return the whole database choosen \"campaign\" in a CSV file
@@ -6,16 +13,14 @@
  * campaign String name of the database choosen
  * no response value expected for this operation
  **/
-const Influx = require('influx'); 
-var jsonexport = require('jsonexport');
-const os = require('os')
+
 var nbCallback = 0;
 var listMeasurements = new Array();
+var dataTable = new Array();
 
 
 exports.measurementsCampaignGET = function(campaign) {
   getAllMeasurements(campaign, function(){
-    var dataTable = new Array();
     getDataFromMeasurements(campaign);
   });
 
@@ -26,7 +31,7 @@ exports.measurementsCampaignGET = function(campaign) {
 
 
 function getAllMeasurements(campaign, callback){
-  const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
+  const influx = new Influx.InfluxDB(apiApolline+campaign);
   var measurements;
   influx.getMeasurements().then( results => {
     listMeasurements = results;
@@ -43,26 +48,43 @@ function getDataFromMeasurements(campaign){
 }
 
 function getDataFromMeasurement(measurement,campaign){
-  const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/'+campaign);
+  const influx = new Influx.InfluxDB(apiApolline+campaign);
   influx.query(`
-    select * from ` + Influx.escape.stringLit(measurement) + `
-    where host = ${Influx.escape.stringLit(os.hostname())}
-    order by time desc
-    limit 10
-    `).then( results => {
-      console.log(results);
-      //receiveCall(results)
+    select * from "` + measurement + `"
+     limit 10
+     `)
+    .then( results => {
+      if (results != null) console.log(results);
+      receiveCall(results);
   }).catch(err => {
     console.log(err);
   });
 }
 
-//add element to dataTable
+// Add element to dataTable
 function receiveCall(results){
   dataTable.push(results);
   if (dataTable.length == listMeasurements.length){
-    console.log("Nombre de mesure ok");
+    console.log("Nombre de mesure: " + dataTable.length);
+    responseCall(dataTable);
   }
+}
+
+// Return the dataTable
+function responseCall(dataTable){
+  dataTable.forEach(function(value){
+    console.log(JSON.stringify(value));
+  });
+  console.log("\n \n");
+  //getCSV(dataTable);
+}
+
+//create the CSV file with the JSON DataTable
+function getCSV(dataArray){
+  jsonexport(dataArray,function(err, csv){
+    if(err) return console.log(err);
+    console.log(csv);
+  });
 }
 
 
