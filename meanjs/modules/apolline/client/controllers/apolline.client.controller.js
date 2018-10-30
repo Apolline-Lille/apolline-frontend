@@ -1,7 +1,7 @@
 'use strict';
 //installation jsonexport to convert json in CSV
-var utils = require('../controllers/apolline.server.config.js');
-var ApollineScience = require('../../client/services/apolline.client.service.js');
+var utils = require('../../server/controllers/apolline.server.controller.js');
+var ApollineScience = require('../services/apolline.client.service.js');
 
 module.exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {
   var campaign = req.swagger.params["campaign"].value;

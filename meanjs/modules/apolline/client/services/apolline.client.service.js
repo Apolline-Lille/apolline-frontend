@@ -1,7 +1,7 @@
 'use strict';
 var http = require('http');
 const Influx = require('influx'); 
-var jsonexport = require('jsonexport/dist');
+var jsonexport = require('jsonexport/bin');
 var fs = require('fs');
 
 const apiApolline = 'http://apolline.lille.inria.fr:8086/';
@@ -14,7 +14,6 @@ const apiApolline = 'http://apolline.lille.inria.fr:8086/';
  * no response value expected for this operation
  **/
 
-var nbCallback = 0;
 var listMeasurements = new Array();
 var dataTable = new Array();
 
@@ -72,9 +71,12 @@ function receiveCall(results){
 
 // Return the dataTable
 function responseCall(dataTable){
-  dataTable.forEach(function(value){
+  Array.prototype.forEach.call(dataTable, value => {
     console.log(JSON.stringify(value));
   });
+  /*dataTable.forEach(function(value){
+    console.log(JSON.stringify(value));
+  });*/
   console.log("\n \n");
   //getCSV(dataTable);
 }
