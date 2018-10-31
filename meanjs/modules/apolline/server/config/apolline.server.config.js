@@ -4,7 +4,6 @@ var fs = require('fs'),
   path = require('path'),
   http = require('http'),
   jsonexport = require('jsonexport/dist');
-    
 const Influx = require('influx');
 
 var app = require('connect')();
@@ -15,16 +14,16 @@ var serverPort = 6060;
 // swaggerRouter configuration
 var options = {
   swaggerUi: path.join(__dirname, '/swagger.json'),
-  controllers: path.join(__dirname, './controllers'),
+  controllers: path.join(__dirname, '../controllers'),
   useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
 };
 
 // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
-var spec = fs.readFileSync(path.join(__dirname,'../api/apolline.yaml'), 'utf8');
+var spec = fs.readFileSync(path.join(__dirname, '../api/apolline.yaml'), 'utf8');
 var swaggerDoc = jsyaml.safeLoad(spec);
 
 // Initialize the Swagger middleware
-/*swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
+/* swaggerTools.initializeMiddleware(swaggerDoc, function (middleware) {
 
   // Interpret Swagger resources and attach metadata to request - must be first in swagger-tools middleware chain
   app.use(middleware.swaggerMetadata());
@@ -46,4 +45,4 @@ var swaggerDoc = jsyaml.safeLoad(spec);
     console.log('Swagger-ui is available on http://localhost:%d/docs \n', serverPort);
   });
 
-});*/
+}); */

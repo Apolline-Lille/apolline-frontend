@@ -1,8 +1,7 @@
 'use strict';
-var http = require('http');
-const Influx = require('influx'); 
-var jsonexport = require('jsonexport/bin');
-var fs = require('fs');
+
+var Influx = require('influx'),
+  jsonexport = require('jsonexport/bin');
 
 const apiApolline = 'http://apolline.lille.inria.fr:8086/';
 
@@ -46,7 +45,7 @@ function getDataFromMeasurements(campaign){
   }); 
 }
 
-function getDataFromMeasurement(measurement,campaign){
+function getDataFromMeasurement(measurement, campaign){
   const influx = new Influx.InfluxDB(apiApolline+campaign);
   influx.query(`
     select * from "` + measurement + `"
@@ -63,7 +62,7 @@ function getDataFromMeasurement(measurement,campaign){
 // Add element to dataTable
 function receiveCall(results){
   dataTable.push(results);
-  if (dataTable.length == listMeasurements.length){
+  if (dataTable.length === listMeasurements.length){
     console.log("Nombre de mesure: " + dataTable.length);
     responseCall(dataTable);
   }
@@ -71,9 +70,9 @@ function receiveCall(results){
 
 // Return the dataTable
 function responseCall(dataTable){
-  Array.prototype.forEach.call(dataTable, value => {
-    console.log(JSON.stringify(value));
-  });
+  for (var i; i < dataTable.length; i++ ){
+    console.log(JSON.stringify(dataTable[i]));
+  }
   /*dataTable.forEach(function(value){
     console.log(JSON.stringify(value));
   });*/

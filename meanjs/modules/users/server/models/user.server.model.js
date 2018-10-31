@@ -260,17 +260,17 @@ function seed(doc, options) {
             username: doc.username
           })
           .exec(function (err, existing) {
-            if (err) {
-              return reject(err);
-            }
+              if (err) {
+                return reject(err);
+              }
 
-            if (!existing) {
-              return resolve(false);
-            }
+              if (!existing) {
+                return resolve(false);
+              }
 
-            if (existing && !options.overwrite) {
-              return resolve(true);
-            }
+              if (existing && !options.overwrite) {
+                return resolve(true);
+              }
 
             // Remove User (overwrite)
 
