@@ -115,8 +115,8 @@ gulp.task('watch:server:run-tests', function () {
 // CSS linting task
 gulp.task('csslint', function () {
   return gulp.src(defaultAssets.client.css)
-  .pipe(plugins.csslint('.csslintrc'))
-  .pipe(plugins.csslint.formatter());
+    .pipe(plugins.csslint('.csslintrc'))
+    .pipe(plugins.csslint.formatter());
   // Don't fail CSS issues yet
   // .pipe(plugins.csslint.failFormatter());
 });
