@@ -1,5 +1,5 @@
 'use strict';
-var utils = require('../utils/writer.js');
+var utils = require('../utils/write.js');
 var ApollineScience = require('../service/apolline.client.service');
 
 module.exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {

@@ -18,9 +18,10 @@ var nbCallback = 0;
 var listMeasurements = new Array();
 var dataTable = new Array();
 
-console.log('HELLOOOOOOOOOOOOOOOOO');
+
 
 exports.measurementsCampaignGET = function(campaign) {
+  console.log('HELLOOOOOOOOOOOOOOOOO');
   getAllMeasurements(campaign, function(){
     getDataFromMeasurements(campaign);
   });

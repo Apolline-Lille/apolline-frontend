@@ -5,6 +5,7 @@
 var fs = require('fs'),
     app = require('express'),
     path = require('path'),
+    config = require(path.resolve('./config/config')),
     http = require('http'),
     jsonexport = require('jsonexport/dist');
     
@@ -15,11 +16,11 @@ var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
 var serverPort = 6060;
 
-module.exports = function () {
+module.exports = function (app) {
   // swaggerRouter configuration
   var options = {
     swaggerUi: path.join(__dirname, '/swagger.json'),
-    controllers: path.join(__dirname, './controllers'),
+    controllers: path.join(__dirname, '../controllers'),
     useStubs: process.env.NODE_ENV === 'development' // Conditionally turn on stubs (mock mode)
   };
 
