@@ -2,10 +2,10 @@
     "name": "api-rest-apolline-frontend",
     "version": "1.0.0",
     "description": "API REST apolline-frontend",
-    "main": "index.js",
+    "main": "apolline.server.config.js",
     "scripts": {
       "prestart": "npm install",
-      "start": "node index.js"
+      "start": "node apolline.server.config.js"
     },
     "keywords": [
       "swagger"

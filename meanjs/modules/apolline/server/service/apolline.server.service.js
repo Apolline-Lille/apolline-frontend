@@ -21,7 +21,6 @@ var dataTable = new Array();
 
 
 exports.measurementsCampaignGET = function(campaign) {
-  console.log('HELLOOOOOOOOOOOOOOOOO');
   getAllMeasurements(campaign, function(){
     getDataFromMeasurements(campaign);
   });

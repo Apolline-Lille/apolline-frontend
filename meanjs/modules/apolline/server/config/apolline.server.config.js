@@ -14,7 +14,7 @@ const Influx = require('influx');
 // var app = require('connect')();
 var swaggerTools = require('swagger-tools');
 var jsyaml = require('js-yaml');
-var serverPort = 6060;
+var serverPort = 80;
 
 module.exports = function (app) {
   // swaggerRouter configuration
@@ -26,6 +26,7 @@ module.exports = function (app) {
 
   // The Swagger document (require it, build it programmatically, fetch it from a URL, ...)
   var spec = fs.readFileSync(path.join(__dirname,'api/swagger.yaml'), 'utf8');
+  console.log(spec);
   var swaggerDoc = jsyaml.safeLoad(spec);
 
   // Initialize the Swagger middleware
@@ -43,13 +44,11 @@ module.exports = function (app) {
     // Serve the Swagger documents and Swagger UI
     app.use(middleware.swaggerUi());
 
-    // Start the server
-    /* http.createServer(app).listen(serverPort, function () {
+    http.createServer(app).listen(serverPort, function () {
       const influx = new Influx.InfluxDB('http://apolline.lille.inria.fr:8086/');
       console.log('You are connected to http://apolline.lille.inria.fr:8086/');
       console.log('Your server is listening on port %d (http://localhost:%d)', serverPort, serverPort);
       console.log('Swagger-ui is available on http://localhost:%d/docs \n', serverPort);
-    }); */
-
+    });
   });
 }
