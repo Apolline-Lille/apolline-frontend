@@ -3,13 +3,17 @@
 /**
  * Module dependencies
  */
-var campaign = require('../controllers/apolline.server.controller');
+var apollinePolicy = require('../policies/apolline.server.policy'),
+  path = require('path'),
+  fs = require('fs'),
+  campaign = require('../controllers/apolline.server.controller');
+
+var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'utf8');
+
 
 module.exports = function (app) {
   // Apolline collection routes
-  app.route('/measurements/'+campaign).get(campaign.measurementsCampaignGET());
-
-  // Finish by binding the apolline middleware
-  app.param('campaign', campaign.measurementsCampaignGET());
+  app.route('/measurements/:campaign').all(apollinePolicy.isAllowed)
+    .get(campaign.measurementsCampaignGET);
 };
 

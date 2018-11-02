@@ -1,10 +1,22 @@
 'use strict';
 
-var utils = require('../utils/write.js');
-var ApollineScience = require('../service/apolline.server.service');
+var utils = require('../utils/write.js'),
+  path = require('path'),
+  fs = require('fs'),
+  ApollineScience = require('../service/apolline.server.service'),
+  errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
-module.exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {
-  var campaign = req.swagger.parameter['campaign'].value;
+var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'utf8');
+
+exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {
+  var campaign;
+  console.log(req.params);
+  var pathParam = req.params.campaign;
+  console.log(pathParam);
+
+  group.save(new dataCallbacks(req, res, next, "campaign").insert());
+
+  var campaign = spec.parameter['campaign'].value;
   ApollineScience.measurementsCampaignGET(campaign)
     .then(function (response) {
       utils.writeCSV(res, response);
