@@ -12,12 +12,10 @@ exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, ne
   var campaign;
   console.log(req.params);
   var pathParam = req.params.campaign;
-  console.log(pathParam);
+  console.log('On est ici: '+pathParam);
 
-  group.save(new dataCallbacks(req, res, next, "campaign").insert());
-
-  var campaign = spec.parameter['campaign'].value;
-  ApollineScience.measurementsCampaignGET(campaign)
+  //group.save(new dataCallbacks(req, res, next, "campaign").insert());
+  ApollineScience.measurementsCampaignGET(pathParam)
     .then(function (response) {
       utils.writeCSV(res, response);
     })
