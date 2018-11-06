@@ -16,12 +16,13 @@ const apiApolline = 'http://apolline.lille.inria.fr:8086/';
 
 var listMeasurements = new Array();
 var dataFromMeasurement = new Array();
+var eltFromMeasurements = new Array();
 var dataTable = new Array();
 
 
 
+
 exports.measurementsCampaignGET = function(campaign) {
-  console.log("entrée dans measurementsCampaignGET");
   getAllMeasurements(campaign, function(){
     console.log("entrée dans la sous fonction");
     getDataFromMeasurements(campaign, listMeasurements);
@@ -33,8 +34,8 @@ exports.measurementsCampaignGET = function(campaign) {
 
 
 function getAllMeasurements(campaign, callback){
-  const influx = new Influx.InfluxDB(apiApolline+campaign);
-  influx.getMeasurements().then( results => {
+  const influxMeasurements = new Influx.InfluxDB(apiApolline+campaign);
+  influxMeasurements.getMeasurements().then( results => {
     listMeasurements = results;
     callback();
   }).catch(err => {
@@ -45,42 +46,38 @@ function getAllMeasurements(campaign, callback){
 function getDataFromMeasurements(campaign, listMeasurements){
   listMeasurements.forEach(function(measurement){
     console.log(measurement);
-    getDataFromMeasurement(measurement, campaign, function(){
-      console.log('entrée dans getDatafromMeasurements/getDataFromMeasurement');
-      receiveCall(dataFromMeasurement);
-    });
-  }); 
+    getDataFromMeasurement(measurement, campaign);
+  });
 }
 
-function getDataFromMeasurement(measurement,campaign, callback){
-  const influx = new Influx.InfluxDB(apiApolline+campaign);
-  influx.query(`
+function getDataFromMeasurement(measurement, campaign){
+  const influxQuery = new Influx.InfluxDB(apiApolline+campaign);
+  influxQuery.query(`
     select * from "` + measurement + `"
      limit 10
      `)
     .then( results => {
-      console.log("Hallelujah");
       dataFromMeasurement = results;
-      callback();
+      receiveCall(dataFromMeasurement, function(){
+        dataTable.push(dataFromMeasurement);
+        console.log('rentrée dans le callback de receiveCall');
+      });
   }).catch(err => {
     console.log(err);
   });
 }
 
 //add element to dataTable
-function receiveCall(results){
-  console.log('rentrée dans receivcall');
-  dataTable.push(results);
-  if (dataTable.length == listMeasurements.length){
-    console.log("Nombre de mesure: " + dataTable.length);
-    responseCall(dataTable);
-  }
+function receiveCall(dataFromMeasurement, callback){
+  eltFromMeasurements.push(dataFromMeasurement);
+  callback();
 }
 
 //return the dataTable
 function responseCall(dataTable){
   console.log("responceCall");
   dataTable.forEach(function(value){
+    console.log("rentrée dans le forEach");
     console.log(JSON.stringify(value));
   });
   console.log("\n \n");
