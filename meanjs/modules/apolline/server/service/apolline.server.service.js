@@ -14,17 +14,18 @@ const apiApolline = 'http://apolline.lille.inria.fr:8086/';
  * no response value expected for this operation
  **/
 
-var nbCallback = 0;
 var listMeasurements = new Array();
+var dataFromMeasurement = new Array();
 var dataTable = new Array();
 
 
 
 exports.measurementsCampaignGET = function(campaign) {
+  console.log("entrée dans measurementsCampaignGET");
   getAllMeasurements(campaign, function(){
-    getDataFromMeasurements(campaign);
+    console.log("entrée dans la sous fonction");
+    getDataFromMeasurements(campaign, listMeasurements);
   });
-
   return new Promise(function(resolve, reject) {
     resolve();
   });
@@ -33,7 +34,6 @@ exports.measurementsCampaignGET = function(campaign) {
 
 function getAllMeasurements(campaign, callback){
   const influx = new Influx.InfluxDB(apiApolline+campaign);
-  var measurements;
   influx.getMeasurements().then( results => {
     listMeasurements = results;
     callback();
@@ -42,24 +42,26 @@ function getAllMeasurements(campaign, callback){
   })
 }
 
-function getDataFromMeasurements(campaign){
+function getDataFromMeasurements(campaign, listMeasurements){
   listMeasurements.forEach(function(measurement){
-    getDataFromMeasurement(measurement, campaign);
+    console.log(measurement);
+    getDataFromMeasurement(measurement, campaign, function(){
+      console.log('entrée dans getDatafromMeasurements/getDataFromMeasurement');
+      receiveCall(dataFromMeasurement);
+    });
   }); 
 }
 
-function getDataFromMeasurement(measurement,campaign){
+function getDataFromMeasurement(measurement,campaign, callback){
   const influx = new Influx.InfluxDB(apiApolline+campaign);
   influx.query(`
     select * from "` + measurement + `"
      limit 10
      `)
     .then( results => {
-      if (results != null) {
-        console.log(results);
-      }
-      var value = results;
-      receiveCall(value)
+      console.log("Hallelujah");
+      dataFromMeasurement = results;
+      callback();
   }).catch(err => {
     console.log(err);
   });
@@ -67,6 +69,7 @@ function getDataFromMeasurement(measurement,campaign){
 
 //add element to dataTable
 function receiveCall(results){
+  console.log('rentrée dans receivcall');
   dataTable.push(results);
   if (dataTable.length == listMeasurements.length){
     console.log("Nombre de mesure: " + dataTable.length);

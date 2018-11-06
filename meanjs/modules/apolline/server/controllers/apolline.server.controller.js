@@ -9,13 +9,9 @@ var utils = require('../utils/write.js'),
 var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'utf8');
 
 exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {
-  var campaign;
-  console.log(req.params);
-  var pathParam = req.params.campaign;
-  console.log('On est ici: '+pathParam);
+  var campaign = req.params.campaign;
 
-  //group.save(new dataCallbacks(req, res, next, "campaign").insert());
-  ApollineScience.measurementsCampaignGET(pathParam)
+  ApollineScience.measurementsCampaignGET(campaign)
     .then(function (response) {
       utils.writeCSV(res, response);
     })
