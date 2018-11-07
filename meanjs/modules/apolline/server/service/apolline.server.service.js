@@ -15,8 +15,7 @@ const apiApolline = 'http://apolline.lille.inria.fr:8086/';
  **/
 
 var listMeasurements = new Array();
-var dataFromMeasurement = new Array();
-var eltFromMeasurements = new Array();
+var data = new Array();
 var dataTable = new Array();
 
 
@@ -24,8 +23,9 @@ var dataTable = new Array();
 
 exports.measurementsCampaignGET = function(campaign) {
   getAllMeasurements(campaign, function(){
-    console.log("entrée dans la sous fonction");
-    getDataFromMeasurements(campaign, listMeasurements);
+    getDataFromMeasurements(campaign, listMeasurements, function(){
+      responseCall(dataTable);
+    });
   });
   return new Promise(function(resolve, reject) {
     resolve();
@@ -43,43 +43,38 @@ function getAllMeasurements(campaign, callback){
   })
 }
 
-function getDataFromMeasurements(campaign, listMeasurements){
+function getDataFromMeasurements(campaign, listMeasurements, callback){
   listMeasurements.forEach(function(measurement){
-    console.log(measurement);
-    getDataFromMeasurement(measurement, campaign);
+    getDataFromMeasurement(measurement, campaign, function(){
+      callback();
+    });
   });
 }
 
-function getDataFromMeasurement(measurement, campaign){
+function getDataFromMeasurement(measurement, campaign, callback){
   const influxQuery = new Influx.InfluxDB(apiApolline+campaign);
   influxQuery.query(`
     select * from "` + measurement + `"
-     limit 10
-     `)
-    .then( results => {
-      dataFromMeasurement = results;
-      receiveCall(dataFromMeasurement, function(){
-        dataTable.push(dataFromMeasurement);
-        console.log('rentrée dans le callback de receiveCall');
-      });
+    limit 10
+  `).then( results => {
+      data = results;
+      receiveCall(JSON.stringify(data));
+      callback();
   }).catch(err => {
+    console.log("erreur de query");
     console.log(err);
   });
 }
 
 //add element to dataTable
-function receiveCall(dataFromMeasurement, callback){
-  eltFromMeasurements.push(dataFromMeasurement);
-  callback();
+function receiveCall(data){
+  dataTable.push(data);
+  console.log('receivCall');
 }
 
 //return the dataTable
 function responseCall(dataTable){
   console.log("responceCall");
-  dataTable.forEach(function(value){
-    console.log("rentrée dans le forEach");
-    console.log(JSON.stringify(value));
-  });
   console.log("\n \n");
   getCSV(dataTable);
 }
