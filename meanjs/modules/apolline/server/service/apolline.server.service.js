@@ -25,11 +25,10 @@ exports.measurementsCampaignGET = async function(campaign) {
   console.log(apiApolline+campaign);
   return new Promise((resolve, reject) => {
     getAllMeasurements(campaign).then(async function(measurements) {
-      console.log("valeur de mesures " +measurements);
       return await createMeasurementsTable(measurements);
     }).then(async function(list) {
       console.log(list);
-      //return await getDataFromMeasurements(campaign, list);
+      return await getDataFromMeasurements(campaign, list);
     }).catch(err => {
       console.log("erreur catch inside return Promise");
       console.log(err);
@@ -48,8 +47,8 @@ exports.measurementsCampaignGET = async function(campaign) {
 async function getAllMeasurements(campaign){
   return new Promise((resolve, reject) => {
     const influxMeasurements = new Influx.InfluxDB(apiApolline + campaign);
-    influxMeasurements.getMeasurements().then( async function(results) {
-      return await resolve(results);
+    influxMeasurements.getMeasurements().then( function(results) {
+      return resolve(results);
     }).catch(err => {
       console.log("erreur measurements");
       console.log(err);
@@ -93,7 +92,7 @@ async function getDataFromMeasurement(measurement, campaign){
     var request = "select * from \"" + measurement + "\" limit 10";
     const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
     influxQuery.query(request).then(async function(results) {
-      return await resolve(results);
+      return resolve(await results);
     }).catch( err => {
         console.log("timeOut");
         console.log(err);
