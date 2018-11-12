@@ -24,15 +24,12 @@ var listMeasurements = new Array();
 exports.measurementsCampaignGET = async function(campaign) {
   console.log(apiApolline+campaign);
   return new Promise((resolve, reject) => {
-    getAllMeasurements(campaign).then(function(measurements) {
+    getAllMeasurements(campaign).then(async function(measurements) {
       console.log("valeur de mesures " +measurements);
-      return createMeasurementsTable(measurements);
-    }).then(function(list) {
-      list.forEach( measurement => {
-        dataTable.push(getDataFromMeasurement(measurement, campaign));
-      });
-      console.log(dataTable);
-      return dataTable;
+      return await createMeasurementsTable(measurements);
+    }).then(async function(list) {
+      console.log(list);
+      //return await getDataFromMeasurements(campaign, list);
     }).catch(err => {
       console.log("erreur catch inside return Promise");
       console.log(err);
@@ -51,8 +48,8 @@ exports.measurementsCampaignGET = async function(campaign) {
 async function getAllMeasurements(campaign){
   return new Promise((resolve, reject) => {
     const influxMeasurements = new Influx.InfluxDB(apiApolline + campaign);
-    influxMeasurements.getMeasurements().then( results => {
-      return resolve(results);
+    influxMeasurements.getMeasurements().then( async function(results) {
+      return await resolve(results);
     }).catch(err => {
       console.log("erreur measurements");
       console.log(err);
@@ -61,10 +58,24 @@ async function getAllMeasurements(campaign){
   });
 }
 
+async function getDataFromMeasurements(campaign, measurements){
+  return new Promise((resolve, reject) => {
+    measurements.forEach(async function(measurement) {
+      var data = await getDataFromMeasurement(measurement,campaign);
+      dataTable.push(data);
+    });
+    return resolve(dataTable);
+  }).catch(err => {
+    console.log("erreur getDataFromMeasurements");
+    console.log(err);
+    return reject();
+  });
+}
+
 async function createMeasurementsTable(measurements){
   return new Promise((resolve, reject) => {
-    measurements.forEach(measurement => {
-      listMeasurements.push(measurement);
+    measurements.forEach(async function(measurement) {
+      listMeasurements.push(await measurement);
     });
     return resolve(listMeasurements);
   }).catch(err => {
@@ -77,12 +88,12 @@ async function createMeasurementsTable(measurements){
 
 
 //return the data from one measurement
-function getDataFromMeasurement(measurement, campaign){
+async function getDataFromMeasurement(measurement, campaign){
   return new Promise((resolve, reject) => {
     var request = "select * from \"" + measurement + "\" limit 10";
     const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
-    influxQuery.query(request).then(results => {
-      return resolve(results);
+    influxQuery.query(request).then(async function(results) {
+      return await resolve(results);
     }).catch( err => {
         console.log("timeOut");
         console.log(err);
@@ -92,12 +103,12 @@ function getDataFromMeasurement(measurement, campaign){
 
 
 //add element to dataTable
-function receiveCall(data){
+async function receiveCall(data){
   return new Promise((resolve, reject) => {
     console.log('entrée dans receiveCall');
     dataTable.push(data);
     console.log(dataTable);
-    return resolve();
+    return resolve(dataTable);
   });
 }
 
