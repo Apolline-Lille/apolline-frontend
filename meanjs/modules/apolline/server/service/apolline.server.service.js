@@ -1,10 +1,9 @@
 'use strict';
-var http = require('http');
-const Influx = require('influx'); 
+var Influx = require('influx'); 
 var jsonexport = require('jsonexport/dist');
 var fs = require('fs');
 
-const apiApolline = 'http://apolline.lille.inria.fr:8086/';
+var apiApolline = 'http://apolline.lille.inria.fr:8086/';
 
 /**
  * Get all the data of the DataBase \"campaign\"
@@ -14,78 +13,95 @@ const apiApolline = 'http://apolline.lille.inria.fr:8086/';
  * no response value expected for this operation
  **/
 
-var listMeasurements = new Array();
-var data = new Array();
+//port connexion: 'http://127.0.0.1:8088'
+//pour localDB: NOAA_water_database
+//measurements: 'average_temperature','h2o_feet','h2o_pH','h2o_quality','h2o_temperature'
+
 var dataTable = new Array();
+var listMeasurements = new Array();
 
-
-
-
-exports.measurementsCampaignGET = function(campaign) {
-  getAllMeasurements(campaign, function(){
-    getDataFromMeasurements(campaign, listMeasurements, function(){
-      responseCall(dataTable);
+//main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
+exports.measurementsCampaignGET = async function(campaign) {
+  console.log(apiApolline+campaign);
+  getAllMeasurements(campaign).then(function(measurements) {
+    console.log(measurements);
+    measurements.forEach( measurement => {
+      dataTable.push(await getDataFromMeasurement(measurement, campaign));
     });
-  });
-  return new Promise(function(resolve, reject) {
-    resolve();
-  });
+    return dataTable;
+  }).then(function(table) {
+    console.log("table " +table);
+  }).catch(err);
 }
 
 
-function getAllMeasurements(campaign, callback){
-  const influxMeasurements = new Influx.InfluxDB(apiApolline+campaign);
-  influxMeasurements.getMeasurements().then( results => {
-    listMeasurements = results;
-    callback();
-  }).catch(err => {
-    console.log(err);
-  })
-}
-
-function getDataFromMeasurements(campaign, listMeasurements, callback){
-  listMeasurements.forEach(function(measurement){
-    getDataFromMeasurement(measurement, campaign, function(){
-      callback();
+//return all the measurements from the database choosen
+async function getAllMeasurements(campaign){
+  return new Promise((resolve, reject) => {
+    const influxMeasurements = new Influx.InfluxDB(apiApolline + campaign);
+    influxMeasurements.getMeasurements().then( results => {
+      return resolve(results);
+    }).catch(err => {
+      console.log("erreur measurements");
+      console.log(err);
+      return reject();
     });
   });
 }
 
-function getDataFromMeasurement(measurement, campaign, callback){
-  const influxQuery = new Influx.InfluxDB(apiApolline+campaign);
-  influxQuery.query(`
-    select * from "` + measurement + `"
-    limit 10
-  `).then( results => {
-      data = results;
-      receiveCall(JSON.stringify(data));
-      callback();
-  }).catch(err => {
-    console.log("erreur de query");
-    console.log(err);
+
+
+//return the data from one measurement
+function getDataFromMeasurement(measurement, campaign){
+  return new Promise((resolve, reject) => {
+    var request = "select * from \"" + measurement + "\" limit 10";
+    const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
+    influxQuery.query(request).then(results => {
+      return resolve(results);
+    }).catch( err => {
+        console.log("timeOut");
+        console.log(err);
+    });
   });
 }
+
 
 //add element to dataTable
 function receiveCall(data){
-  dataTable.push(data);
-  console.log('receivCall');
-}
-
-//return the dataTable
-function responseCall(dataTable){
-  console.log("responceCall");
-  console.log("\n \n");
-  getCSV(dataTable);
-}
-
-//create the CSV file with the JSON DataTable
-function getCSV(dataArray){
-  console.log("getCSV");
-  jsonexport(dataArray,function(err, csv){
-    if(err) return console.log(err);
-    console.log(csv);
+  return new Promise((resolve, reject) => {
+    console.log('entrée dans receiveCall');
+    dataTable.push(data);
+    console.log(dataTable);
+    return resolve();
   });
 }
 
+//return the dataTable
+function responseCall(arrayOfData){
+  console.log("responceCall");
+  console.log("\n \n");
+  getCSV(arrayOfData);
+}
+
+//create the CSV file with the JSON DataTable
+function getCSV(dataArray, callback){
+  console.log("getCSV");
+  jsonexport(dataArray,function(err, csv){
+    if(err) {
+      console.log("nul");
+      return console.log(err);
+    } 
+    console.log("csv");
+  });
+}
+
+function createFile(data){
+  fs.writeFile('telechargement/formList.csv', data, 'utf8', function (err) {
+    if (err) {
+      console.log('Some error occured - file either not saved or corrupted file saved.');
+    } else{
+      console.log('It\'s saved!');
+    }
+  });
+}
 
