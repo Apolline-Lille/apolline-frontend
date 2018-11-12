@@ -23,15 +23,27 @@ var listMeasurements = new Array();
 //main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
 exports.measurementsCampaignGET = async function(campaign) {
   console.log(apiApolline+campaign);
-  getAllMeasurements(campaign).then(function(measurements) {
-    console.log(measurements);
-    measurements.forEach( measurement => {
-      dataTable.push(await getDataFromMeasurement(measurement, campaign));
+  return new Promise((resolve, reject) => {
+    getAllMeasurements(campaign).then(function(measurements) {
+      console.log("valeur de mesures " +measurements);
+      return createMeasurementsTable(measurements);
+    }).then(function(list) {
+      list.forEach( measurement => {
+        dataTable.push(getDataFromMeasurement(measurement, campaign));
+      });
+      console.log(dataTable);
+      return dataTable;
+    }).catch(err => {
+      console.log("erreur catch inside return Promise");
+      console.log(err);
+      return reject();
     });
-    return dataTable;
-  }).then(function(table) {
-    console.log("table " +table);
-  }).catch(err);
+    resolve(dataTable);
+  }).catch(err =>{
+    console.log("erreur outside return Promise");
+    console.log(err);
+    return reject();
+  });
 }
 
 
@@ -47,6 +59,19 @@ async function getAllMeasurements(campaign){
       return reject();
     });
   });
+}
+
+async function createMeasurementsTable(measurements){
+  return new Promise((resolve, reject) => {
+    measurements.forEach(measurement => {
+      listMeasurements.push(measurement);
+    });
+    return resolve(listMeasurements);
+  }).catch(err => {
+    console.log("erreur measurements");
+    console.log(err);
+    return reject();
+  });  
 }
 
 

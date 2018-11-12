@@ -7,7 +7,7 @@ var ResponsePayload = function(code, value) {
     return new ResponsePayload(code, value);
   }
   
-  var writeCSV = exports.writeCSV = function(response, arg1, arg2) {
+  var writeCSV = exports.writeCSV = async function(response, arg1, arg2) {
     var code;
     var value;
   
