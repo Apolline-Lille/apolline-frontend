@@ -61,7 +61,7 @@ async function getDataFromMeasurements(campaign, measurements){
   return new Promise((resolve, reject) => {
     measurements.forEach(async function(measurement) {
       var data = await getDataFromMeasurement(measurement,campaign);
-      dataTable.push(data);
+      await receiveCall(data);
     });
     return resolve(dataTable);
   }).catch(err => {
