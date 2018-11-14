@@ -36,7 +36,7 @@ var ResponsePayload = function(code, value) {
       code = 200;
     }
     if(typeof value === 'object') {
-      var data = await JSON.stringify(value);
+      var data = JSON.stringify(value);
       console.log('data = '+data);
     }
     response.writeHead(code, {'Content-Type': 'application/json'});

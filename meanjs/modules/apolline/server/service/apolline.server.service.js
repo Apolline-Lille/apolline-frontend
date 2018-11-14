@@ -4,6 +4,7 @@ var jsonexport = require('jsonexport/dist');
 var fs = require('fs');
 
 var apiApolline = 'http://apolline.lille.inria.fr:8086/';
+//'http://apolline.lille.inria.fr:8086/';
 
 /**
  * Get all the data of the DataBase \"campaign\"
@@ -13,7 +14,7 @@ var apiApolline = 'http://apolline.lille.inria.fr:8086/';
  * no response value expected for this operation
  **/
 
-//port connexion: 'http://127.0.0.1:8088'
+//port connexion: http://root:root@127.0.0.1:8086
 //pour localDB: NOAA_water_database
 //measurements: 'average_temperature','h2o_feet','h2o_pH','h2o_quality','h2o_temperature'
 
@@ -21,83 +22,59 @@ var dataTable = new Array();
 var listMeasurements = new Array();
 
 //main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
-exports.measurementsCampaignGET = async function(campaign) {
-  console.log("Lancement de getAllMeasurements");
-  const influx = new Influx.InfluxDB(apiApolline + campaign);
-  for (var i = 0; i < 10; i++) {
-    test(influx, i);
-  }
-
-  /*
-  const influx = new Influx.InfluxDB(apiApolline + campaign);
-  return new Promise(async function(resolve, reject) {
-    getAllMeasurements(influx).then(async function(measurements) {
-      console.log(measurements);
-      return createMeasurementsTable(await measurements);
-    }).then(function(listMeasurements) {
-      console.log(listMeasurements);
-      return getDataFromMeasurements(influx,listMeasurements);
-    }).then(async function(allData) {
-      console.log(allData);
-    }).catch(err => {
-      console.log("erreur catch inside return Promise");
+exports.measurementsCampaignGET = async (campaign) => {
+  return new Promise(async (resolve,reject) =>{
+    console.log("Lancement de getAllMeasurements");
+    const influx = new Influx.InfluxDB(apiApolline);
+    await influx.getMeasurements(campaign).then( async (measurements) => {
+      return createMeasurementsTable(measurements);
+    }).then (async (listMeasurements) => {
+      return start(listMeasurements, campaign);
+    }).then ( async () => {
+      console.log("tu as tous les résultats");
+      console.log(dataTable.length);
+    }).catch( async (err) => {
+      console.log("erreur forEach async");
       console.log(err);
-      return reject(err);
     });
-    resolve(dataTable);
-  }).catch(err =>{
-    console.log("erreur outside return Promise");
+    return resolve(dataTable);
+  }).catch( async (err) => {
+    console.log("main err");
     console.log(err);
-    return reject();
-  });*/
-}
-
-function test(influx, i) {
-  influx.getMeasurements().then(measurements => {
-    console.log("Numero " + i + " = OK");
-  }).catch(err => {
-    console.log("Numero " + i + " = KO FAILED");
-  });  
-}
-
-
-//return all the measurements from the database choosen
-async function getAllMeasurements(influx){
-  return new Promise((resolve, reject) => {
-    influx.getMeasurements().then(async function(results) {
-      resolve(await results);
-    }).catch(err => {
-      console.log("erreur measurements");
-      console.log(err);
-      reject();
-    });
   });
 }
 
-async function getDataFromMeasurements(influx, measurements){
-  return new Promise(async function(resolve, reject){
-    measurements.forEach(async function(measurement){
-      var dataMeasurement = await getDataFromMeasurement(influx, measurement);
-      dataTable.push(dataMeasurement);
-    });
-    resolve(await dataTable);
-  }).catch(err => {
-    console.log("error getDataFromMeasurements");
-    reject(err);
-  })
+const start = async (listMeasurements, campaign) => {
+  var i = 0;
+  await asyncForEach(listMeasurements, async (measurement) => {
+    avancement(i);
+    await getDataFromMeasurement(measurement, campaign);
+    i++;
+  });
 }
 
-async function getDataFromMeasurement(influx, measurement){
-  return new Promise(async function(resolve, reject){
-    //await measurements.forEach(async function(measurement) {
+const asyncForEach = async (array, callback) =>{
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
+const avancement = async (i) =>{
+  console.log(i);
+}
+
+const getDataFromMeasurement = async (measurement, campaign) => {
+  return new Promise(async (resolve, reject) => {
     var request = "select * from \"" + measurement + "\" limit 1";
-    await influx.query(request).then(async function(results) {
-      resolve(await results);
-    }).catch( err => {
-        console.log("timeOut");
-        console.log(err);
+    const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
+    influxQuery.query(request).then( async (results) => {
+      console.log(results);
+      dataTable.push(results);
+      resolve();
+    }).catch( async (err) => {
+      console.log("timeOut");
+      console.log(err);
     });
-  }).catch(err => {
+  }).catch( async (err) => {
     console.log("erreur getDataFromMeasurements");
     console.log(err);
     reject();
@@ -105,55 +82,25 @@ async function getDataFromMeasurement(influx, measurement){
 }
 
 
-async function createMeasurementsTable(measurements){
-  return new Promise(async function(resolve, reject) {
-    measurements.forEach(async function(measurement){
+const createMeasurementsTable = async (measurements) =>{
+  return new Promise(async (resolve, reject) =>{
+    await measurements.forEach(async (measurement) =>{
       listMeasurements.push(measurement);
     });
     console.log("listMeasurements: " + listMeasurements);
     return resolve(await listMeasurements);
-  }).catch(err => {
+  }).catch( async (err) => {
     console.log("create table measurements");
     console.log(err);
     return reject();
   });  
 }
 
-async function createDataTable(datas){
-  return new Promise((resolve, reject) => {
-    datas.forEach(async function(data) {
-      dataTable.push(await data);
-    });
-    return resolve(dataTable);
-  }).catch(err => {
-    console.log("erreur measurements");
-    console.log(err);
-    return reject();
-  });  
-}
-
-
-//add element to dataTable
-async function receiveCall(data){
-  return new Promise((resolve, reject) => {
-    console.log('entrée dans receiveCall');
-    dataTable.push(data);
-    console.log(dataTable);
-    return resolve(dataTable);
-  });
-}
-
-//return the dataTable
-function responseCall(arrayOfData){
-  console.log("responceCall");
-  console.log("\n \n");
-  getCSV(arrayOfData);
-}
 
 //create the CSV file with the JSON DataTable
-function getCSV(dataArray, callback){
+var getCSV = async (dataArray) =>{
   console.log("getCSV");
-  jsonexport(dataArray,function(err, csv){
+  jsonexport(dataArray,async (err, csv) =>{
     if(err) {
       console.log("nul");
       return console.log(err);
