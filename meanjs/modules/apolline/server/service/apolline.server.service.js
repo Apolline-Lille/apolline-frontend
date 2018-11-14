@@ -29,7 +29,16 @@ exports.measurementsCampaignGET = async (campaign) => {
     await influx.getMeasurements(campaign).then( async (measurements) => {
       return createMeasurementsTable(measurements);
     }).then (async (listMeasurements) => {
-      return start(listMeasurements, campaign);
+      const start = async () => {
+        var i = 0;
+        await asyncForEach(listMeasurements, async (measurement) => {
+          avancement(i);
+          await getDataFromMeasurement(measurement, campaign);
+          i++;
+        });
+      }
+      return start();
+      //return start(listMeasurements, campaign);
     }).then ( async () => {
       console.log("tu as tous les résultats");
       console.log(dataTable.length);
@@ -44,14 +53,14 @@ exports.measurementsCampaignGET = async (campaign) => {
   });
 }
 
-const start = async (listMeasurements, campaign) => {
+/*const start = async (listMeasurements, campaign) => {
   var i = 0;
   await asyncForEach(listMeasurements, async (measurement) => {
     avancement(i);
     await getDataFromMeasurement(measurement, campaign);
     i++;
   });
-}
+}*/
 
 const asyncForEach = async (array, callback) =>{
   for (let index = 0; index < array.length; index++) {
@@ -67,7 +76,6 @@ const getDataFromMeasurement = async (measurement, campaign) => {
     var request = "select * from \"" + measurement + "\" limit 1";
     const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
     influxQuery.query(request).then( async (results) => {
-      console.log(results);
       dataTable.push(results);
       resolve();
     }).catch( async (err) => {
