@@ -38,10 +38,24 @@ exports.measurementsCampaignGET = async (campaign) => {
         });
       }
       return start();
-      //return start(listMeasurements, campaign);
     }).then ( async () => {
       console.log("tu as tous les résultats");
       console.log(dataTable.length);
+      const start = async () => {
+        var i = 0;
+        await asyncForEach(dataTable, async (dataFromMeasurement) => {
+          avancement(i);
+          await jsonexport(dataFromMeasurement,function(err, csv){
+            if(err) {
+              console.log("nul");
+              return console.log(err);
+            } 
+            console.log(csv);
+          });
+          i++;
+        });
+      }
+      return start();
     }).catch( async (err) => {
       console.log("erreur forEach async");
       console.log(err);
@@ -53,6 +67,7 @@ exports.measurementsCampaignGET = async (campaign) => {
   });
 }
 
+
 /*const start = async (listMeasurements, campaign) => {
   var i = 0;
   await asyncForEach(listMeasurements, async (measurement) => {
@@ -60,6 +75,7 @@ exports.measurementsCampaignGET = async (campaign) => {
     await getDataFromMeasurement(measurement, campaign);
     i++;
   });
+  return dataTable;
 }*/
 
 const asyncForEach = async (array, callback) =>{
@@ -73,19 +89,19 @@ const avancement = async (i) =>{
 
 const getDataFromMeasurement = async (measurement, campaign) => {
   return new Promise(async (resolve, reject) => {
-    var request = "select * from \"" + measurement + "\" limit 1";
+    var request = "select * from \"" + measurement + "\" limit 50";
     const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
-    influxQuery.query(request).then( async (results) => {
+    await influxQuery.query(request).then( async (results) => {
       dataTable.push(results);
-      resolve();
-    }).catch( async (err) => {
-      console.log("timeOut");
+    }).catch(async(err) => {
+      console.log("push results");
       console.log(err);
+      return reject();
     });
+    return resolve();
   }).catch( async (err) => {
     console.log("erreur getDataFromMeasurements");
     console.log(err);
-    reject();
   });
 }
 
@@ -113,7 +129,7 @@ var getCSV = async (dataArray) =>{
       console.log("nul");
       return console.log(err);
     } 
-    console.log("csv");
+    console.log(csv);
   });
 }
 
