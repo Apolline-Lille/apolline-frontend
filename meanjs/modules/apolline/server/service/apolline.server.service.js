@@ -2,6 +2,7 @@
 var Influx = require('influx'); 
 var jsonexport = require('jsonexport/dist');
 var fs = require('fs');
+var util = require('util');
 
 var apiApolline = 'http://apolline.lille.inria.fr:8086/';
 //'http://apolline.lille.inria.fr:8086/';
@@ -36,47 +37,42 @@ exports.measurementsCampaignGET = async (campaign) => {
           await getDataFromMeasurement(measurement, campaign);
           i++;
         });
+        return dataTable;
       }
       return start();
-    }).then ( async () => {
+    }).then ( async (table) => {
       console.log("tu as tous les résultats");
-      console.log(dataTable.length);
-      const start = async () => {
+      console.log(table.length);
+      const csv = async () => {
         var i = 0;
-        await asyncForEach(dataTable, async (dataFromMeasurement) => {
-          avancement(i);
-          await jsonexport(dataFromMeasurement,function(err, csv){
-            if(err) {
-              console.log("nul");
-              return console.log(err);
-            } 
-            console.log(csv);
-          });
-          i++;
+        await jsonexport(table,function(err, csv){
+          if(err) {
+            console.log("nul");
+            return console.log(err);
+          }
+          fs.writeFileSync("./CSVDownload/data" + Date.now() + ".csv", csv, "UTF-8");
+          return csv;
         });
       }
-      return start();
+      //var reader = fs.createReadStream('data.json');
+      //var writer = fs.createWriteStream('out.csv');
+
+      //reader.pipe(csv).pipe(writer);
+      console.log("csv "+ csv);
+      return csv();
+    }).then( async (data) => {
+      console.log("ok");
+      console.log(data);
     }).catch( async (err) => {
       console.log("erreur forEach async");
       console.log(err);
     });
-    return resolve(dataTable);
+    return resolve();
   }).catch( async (err) => {
     console.log("main err");
     console.log(err);
   });
 }
-
-
-/*const start = async (listMeasurements, campaign) => {
-  var i = 0;
-  await asyncForEach(listMeasurements, async (measurement) => {
-    avancement(i);
-    await getDataFromMeasurement(measurement, campaign);
-    i++;
-  });
-  return dataTable;
-}*/
 
 const asyncForEach = async (array, callback) =>{
   for (let index = 0; index < array.length; index++) {
@@ -88,20 +84,19 @@ const avancement = async (i) =>{
 }
 
 const getDataFromMeasurement = async (measurement, campaign) => {
+  var request = "select * from \"" + measurement + "\" limit 50";
+  const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
   return new Promise(async (resolve, reject) => {
-    var request = "select * from \"" + measurement + "\" limit 50";
-    const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
-    await influxQuery.query(request).then( async (results) => {
+    await influxQuery.query(request).then(async (results) => {
       dataTable.push(results);
-    }).catch(async(err) => {
-      console.log("push results");
+    }).catch( err => {
       console.log(err);
-      return reject();
     });
-    return resolve();
+    return resolve(await dataTable);
   }).catch( async (err) => {
     console.log("erreur getDataFromMeasurements");
     console.log(err);
+    reject();
   });
 }
 
