@@ -43,26 +43,18 @@ exports.measurementsCampaignGET = async (campaign) => {
     }).then ( async (table) => {
       console.log("tu as tous les résultats");
       console.log(table.length);
-      const csv = async () => {
-        var i = 0;
-        await jsonexport(table,function(err, csv){
-          if(err) {
-            console.log("nul");
-            return console.log(err);
-          }
-          fs.writeFileSync("./CSVDownload/data" + Date.now() + ".csv", csv, "UTF-8");
-          return csv;
-        });
-      }
-      //var reader = fs.createReadStream('data.json');
-      //var writer = fs.createWriteStream('out.csv');
-
-      //reader.pipe(csv).pipe(writer);
-      console.log("csv "+ csv);
-      return csv();
-    }).then( async (data) => {
+      await jsonexport(table,function(err, csv){
+        if(err) {
+          console.log("nul");
+          return console.log(err);
+        }
+        console.log("csv : \n" + csv );
+        fs.writeFileSync("./CSVDownload/data" + Date.now() + ".csv", console.log(csv), "UTF-8");
+        return csv;
+      });
+    }).then( async (value) => {
       console.log("ok");
-      console.log(data);
+      console.log(value);
     }).catch( async (err) => {
       console.log("erreur forEach async");
       console.log(err);
