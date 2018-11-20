@@ -68,3 +68,18 @@ $ docker-compose up
 ```
 This final command launch your app and finally you can go to the http://localhost:80/ in your browser to see the application.
 
+To get the CSV and the data, once the bash show:
+```bash
+meanjs      | MEAN.JS - Development Environment
+meanjs      | 
+meanjs      | Environment:     development
+meanjs      | Server:          http://0.0.0.0:80
+meanjs      | Database:        mongodb://db/mean-dev
+meanjs      | App version:     0.6.0
+meanjs      | MEAN.JS version: 0.6.0
+```
+Open a new console and write:
+```bash
+curl http://0.0.0.0:80/measurements/loa
+```
+

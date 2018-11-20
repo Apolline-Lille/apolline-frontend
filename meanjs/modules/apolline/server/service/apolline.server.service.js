@@ -15,7 +15,7 @@ var apiApolline = 'http://apolline.lille.inria.fr:8086/';
  * no response value expected for this operation
  **/
 
-//port connexion: http://root:root@127.0.0.1:8086
+//port connexion: http://root:root@127.0.0.1:8088
 //pour localDB: NOAA_water_database
 //measurements: 'average_temperature','h2o_feet','h2o_pH','h2o_quality','h2o_temperature'
 
@@ -49,9 +49,12 @@ exports.measurementsCampaignGET = async (campaign) => {
           return console.log(err);
         }
         console.log("csv : \n" + csv );
-        fs.writeFileSync("./CSVDownload/data" + Date.now() + ".csv", console.log(csv), "UTF-8");
-        return csv;
+        fs.writeFile("./CSVDownload/data" + Date.now() + ".csv", csv, (err) => {
+          if (err) throw err;
+          console.log('The file has been saved!');
+        });
       });
+      
     }).then( async (value) => {
       console.log("ok");
       console.log(value);
@@ -76,19 +79,19 @@ const avancement = async (i) =>{
 }
 
 const getDataFromMeasurement = async (measurement, campaign) => {
-  var request = "select * from \"" + measurement + "\" limit 50";
+  var request = "select * from \"" + measurement + "\" limit 10";
   const influxQuery = new Influx.InfluxDB(apiApolline + campaign);
   return new Promise(async (resolve, reject) => {
     await influxQuery.query(request).then(async (results) => {
-      dataTable.push(results);
-    }).catch( err => {
+      dataTable.push(await results);
+    }).catch( async (err) => {
       console.log(err);
+      reject(err);
     });
     return resolve(await dataTable);
   }).catch( async (err) => {
     console.log("erreur getDataFromMeasurements");
     console.log(err);
-    reject();
   });
 }
 
@@ -111,7 +114,7 @@ const createMeasurementsTable = async (measurements) =>{
 //create the CSV file with the JSON DataTable
 var getCSV = async (dataArray) =>{
   console.log("getCSV");
-  jsonexport(dataArray,async (err, csv) =>{
+  jsonexport(dataArray,function(err, csv){
     if(err) {
       console.log("nul");
       return console.log(err);
