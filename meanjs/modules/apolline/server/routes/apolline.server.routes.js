@@ -14,6 +14,6 @@ var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'u
 module.exports = function (app) {
   // Apolline collection routes
   app.route('/measurements/:campaign').all(apollinePolicy.isAllowed)
-    .get(campaign.measurementsCampaignGET);
+    .get(campaign.measurementsCampaignGET)
 };
 
