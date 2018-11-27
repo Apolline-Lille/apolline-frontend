@@ -25,6 +25,7 @@ var apiApolline = "apolline.lille.inria.fr:8086/";
 
 var dataTable = new Array();
 var listMeasurements = new Array();
+var dataMeasurements = new Array();
 
 //fonctionne une fois sur 2
 //main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
@@ -36,7 +37,6 @@ var listMeasurements = new Array();
 exports.measurementsCampaignGET = async(campaign) => {
 
   var request = encodeURIComponent("SELECT * FROM \"pm.10.value\"");
-  console.log(request);
   var options = {
     host: "apolline.lille.inria.fr",
     port: 8086,
@@ -44,20 +44,45 @@ exports.measurementsCampaignGET = async(campaign) => {
     method: 'GET'
   };
 
-  console.log(options);
-  var req = await http.get(options, async (res) => {
-    console.log(res);
-    //console.log('STATUS:' + res.statusCode);
-    //console.log('BODY:' + res.body);
-    console.log(res.setEncoding("utf-8"));
-    console.log(res.resume);
-  });
+  var url = "http://" + options.host + ":" + options.port + options.path;
+  console.log(url);
 
-  req.on('error', async (e) => {
-    console.error(`problem with request: ${e.message}`);
-  });
-  // write data to request body
-  await req.write(req.body, function(err){
-    req.end();
+  http.get(url, (res) => {
+    const { statusCode } = res;
+    const contentType = res.headers['content-type'];
+
+    let error;
+    if (statusCode !== 200) {
+      error = new Error('Request Failed.\n' +
+                        `Status Code: ${statusCode}`);
+    } else if (!/^application\/json/.test(contentType)) {
+      error = new Error('Invalid content-type.\n' +
+                        `Expected application/json but received ${contentType}`);
+    }
+    if (error) {
+      console.error(error.message);
+      // consume response data to free up memory
+      res.resume();
+      return;
+    }
+
+    res.setEncoding('utf8');
+    let rawData = '';
+    res.on('data', (chunk) => {
+      console.log("chunk");
+      console.log(chunk);
+      rawData += chunk; 
+    });
+    res.on('end', () => {
+      try {
+        const parsedData = JSON.parse(rawData);
+        console.log("ici");
+        console.log(parsedData);
+      } catch (e) {
+        console.error(e.message);
+      }
+    });
+  }).on('error', (e) => {
+    console.error(`Got error: ${e.message}`);
   });
 }
