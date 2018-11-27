@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Apolline-Lille/apolline-frontend#readme",
   "dependencies": {
-    "influx": "^5.0.7"
+    "influx": "^5.0.7",
+    "node-zip": "^1.1.1"
   }
 }
