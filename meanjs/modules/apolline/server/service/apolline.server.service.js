@@ -30,37 +30,19 @@ var dataMeasurement = new Array();
 
 
 exports.measurementsCampaignGET = async(campaign) => {
-
-    console.log("Lancement de getAllMeasurements");
-    await getMeasurements(campaign).then( async () => {
-      return await listMeasurements;
-    }).then (async () => {
-      console.log(listMeasurements.results.series.values);
-      listMeasurements.values().forEach((measurement) => {
-        console.log(measurement);
-      });
-      /*const start = async () => {
-        var i = 0;
-        await asyncForEach(listMeasurements.values(), async (measurement) => {
-          avancement(i);
-          console.log(listMeasurements.values);
-          await getDataFromMeasurement(measurement, campaign);
-          i++;
-          await dataTable.push(dataMeasurement);
-          dataMeasurement.splice(0,dataMeasurement.length)
-        });
-        return dataTable;
-      }
-      return start();*/
-    }).then( () => {
-      console.log(dataTable);
-    }).catch( async (err) => {
-      console.log("erreur forEach async");
-      console.log(err);
+  try{
+    getMeasurements(campaign, function(){
+      listMeasurements.forEach((measurement) => {
+        console.log("main list: " +measurement);
+      });        
     });
+  }
+  catch{
+
+  }
 }
 
-const getMeasurements = async(campaign) => {
+const getMeasurements = (campaign, callback) => {
   var request = encodeURIComponent("SHOW MEASUREMENTS");
   var options = {
     host: "apolline.lille.inria.fr",
@@ -99,10 +81,11 @@ const getMeasurements = async(campaign) => {
     res.on('end', () => {
       try {
         const parsedData = JSON.parse(rawData);
-        listMeasurements.push(parsedData);
-        console.log(parsedData.results["series"]);
-        console.log(rawData);
-        console.log("listMeasurement "+listMeasurements);
+        parsedData["results"][0]["series"][0]["values"].forEach((measurement) => {
+          listMeasurements.push(measurement);
+        });
+        console.log("listMeasurement :" + listMeasurements);
+        callback();
       } catch (e) {
         console.error(e.message);
       }
