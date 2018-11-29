@@ -20,6 +20,7 @@ var http = require('http');
 
 var dataTable = new Array();
 var listMeasurements = new Array();
+var nameColumns = new Array();
 var dataMeasurement = new Array();
 
 //fonctionne une fois sur 2
@@ -30,119 +31,195 @@ var dataMeasurement = new Array();
 
 
 exports.measurementsCampaignGET = async(campaign) => {
-  try{
-    getMeasurements(campaign, function(){
-      listMeasurements.forEach((measurement) => {
-        console.log("main list: " +measurement);
-      });        
-    });
-  }
-  catch{
-
-  }
-}
-
-const getMeasurements = (campaign, callback) => {
-  var request = encodeURIComponent("SHOW MEASUREMENTS");
-  var options = {
-    host: "apolline.lille.inria.fr",
-    port: 8086,
-    path: "/query?db="+campaign+"&q="+request,
-    method: 'GET'
-  };
-
-  var url = "http://" + options.host + ":" + options.port + options.path;
-  console.log(url);
-
-  http.get(url, (res) => {
-    const { statusCode } = res;
-    const contentType = res.headers['content-type'];
-
-    let error;
-    if (statusCode !== 200) {
-      error = new Error('Request Failed.\n' +
-                        `Status Code: ${statusCode}`);
-    } else if (!/^application\/json/.test(contentType)) {
-      error = new Error('Invalid content-type.\n' +
-                        `Expected application/json but received ${contentType}`);
-    }
-    if (error) {
-      console.error(error.message);
-      // consume response data to free up memory
-      res.resume();
-      return;
-    }
-
-    res.setEncoding('utf8');
-    let rawData = '';
-    res.on('data', (chunk) => {
-      rawData += chunk;
-    });
-    res.on('end', () => {
-      try {
-        const parsedData = JSON.parse(rawData);
-        parsedData["results"][0]["series"][0]["values"].forEach((measurement) => {
-          listMeasurements.push(measurement);
+  var start = new Date().getTime();
+  console.log("début " + start);
+  return new Promise(async (resolve, reject) => {
+    console.log("Début fonction");
+    await getMeasurements(campaign).then( async () => {
+      console.log(listMeasurements);
+      await getColumnsName(listMeasurements[0][0], campaign).then( async() => {
+        console.log(nameColumns);
+        await asyncForEach(listMeasurements, async(measurement) => {
+          await getDataFromMeasurement(measurement, campaign).then( async () => {
+            await dataTable.push(dataMeasurement);
+            dataMeasurement = [];
+          });
         });
-        console.log("listMeasurement :" + listMeasurements);
-        callback();
-      } catch (e) {
-        console.error(e.message);
-      }
-    });
-  }).on('error', (e) => {
-    console.error(`Got error: ${e.message}`);
+      });
+    }).then(async () => {
+      await console.log(dataTable[1]);
+      var end = new Date().getTime();
+      console.log("end " + end);
+      console.log("durée du programme: " + Math.abs(end - start)/60000);
+      await console.log("dans le foreach: " + dataTable);
+      resolve(dataTable);    
+    }).catch ( async (err) => {
+      console.log(err);
+      reject(err);
+    });   
   });
 }
 
-const getDataFromMeasurement = async(measurement, campaign) => {
-  var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\"");
-  var options = {
-    host: "apolline.lille.inria.fr",
-    port: 8086,
-    path: "/query?db="+campaign+"&q="+request,
-    method: 'GET'
-  };
+const getMeasurements = async (campaign) => {
+  return new Promise((resolve, reject) => {
+    var request = encodeURIComponent("SHOW MEASUREMENTS");
+    var options = {
+      host: "apolline.lille.inria.fr",
+      port: 8086,
+      path: "/query?db="+campaign+"&q="+request,
+      method: 'GET'
+    };
 
-  var url = "http://" + options.host + ":" + options.port + options.path;
-  console.log(url);
+    var url = "http://" + options.host + ":" + options.port + options.path;
+    console.log(url);
 
-  http.get(url, (res) => {
-    const { statusCode } = res;
-    const contentType = res.headers['content-type'];
+    http.get(url, (res) => {
+      const { statusCode } = res;
+      const contentType = res.headers['content-type'];
 
-    let error;
-    if (statusCode !== 200) {
-      error = new Error('Request Failed.\n' +
-                        `Status Code: ${statusCode}`);
-    } else if (!/^application\/json/.test(contentType)) {
-      error = new Error('Invalid content-type.\n' +
-                        `Expected application/json but received ${contentType}`);
-    }
-    if (error) {
-      console.error(error.message);
-      // consume response data to free up memory
-      res.resume();
-      return;
-    }
-
-    res.setEncoding('utf8');
-    let rawData = '';
-    res.on('data', (chunk) => {
-      rawData += chunk;
-    });
-    res.on('end', () => {
-      try {
-        dataMeasurement.push(rawData);
-        const parsedData = JSON.parse(rawData);
-        console.log(dataMeasurement);
-        console.log(parsedData);
-      } catch (e) {
-        console.error(e.message);
+      let error;
+      if (statusCode !== 200) {
+        error = new Error('Request Failed.\n' +
+                          `Status Code: ${statusCode}`);
+      } else if (!/^application\/json/.test(contentType)) {
+        error = new Error('Invalid content-type.\n' +
+                          `Expected application/json but received ${contentType}`);
       }
+      if (error) {
+        console.error(error.message);
+        // consume response data to free up memory
+        res.resume();
+        return;
+      }
+
+      res.setEncoding('utf8');
+      let rawData = '';
+      res.on('data', (chunk) => {
+        rawData += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(rawData);
+          parsedData["results"][0]["series"][0]["values"].forEach((measurement) => {
+            listMeasurements.push(measurement);
+          });
+          console.log("dans getMeasurements: "+listMeasurements);
+          resolve(listMeasurements);
+        } catch (e) {
+          console.error(e.message);
+        }
+      });
+    }).on('error', (e) => {
+      console.error(`Got error: ${e.message}`);
     });
-  }).on('error', (e) => {
-    console.error(`Got error: ${e.message}`);
+  });
+}
+
+const getColumnsName = async (measurement, campaign) => {
+  return new Promise((resolve, reject) => {
+    var request = encodeURIComponent("SHOW TAG KEYS FROM \"" + measurement + "\"");
+    var options = {
+      host: "apolline.lille.inria.fr",
+      port: 8086,
+      path: "/query?db="+campaign+"&q="+request,
+      method: 'GET'
+    };
+
+    var url = "http://" + options.host + ":" + options.port + options.path;
+    console.log(url);
+
+    http.get(url, (res) => {
+      const { statusCode } = res;
+      const contentType = res.headers['content-type'];
+
+      let error;
+      if (statusCode !== 200) {
+        error = new Error('Request Failed.\n' +
+                          `Status Code: ${statusCode}`);
+      } else if (!/^application\/json/.test(contentType)) {
+        error = new Error('Invalid content-type.\n' +
+                          `Expected application/json but received ${contentType}`);
+      }
+      if (error) {
+        console.error(error.message);
+        // consume response data to free up memory
+        res.resume();
+        return;
+      }
+
+      res.setEncoding('utf8');
+      let rawData = '';
+      res.on('data', (chunk) => {
+        rawData += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(rawData);
+          nameColumns.push(parsedData["results"][0]["series"][0]["values"]);
+          resolve(nameColumns);
+        } catch (e) {
+          console.error(e.message);
+        }
+      });
+    }).on('error', (e) => {
+      console.error(`Got error: ${e.message}`);
+    });
+  });
+}
+
+const getDataFromMeasurement = async (measurement, campaign) => {
+  return new Promise((resolve, reject) => {
+    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 1");
+    var options = {
+      host: "apolline.lille.inria.fr",
+      port: 8086,
+      path: "/query?db="+campaign+"&q="+request,
+      method: 'GET'
+    };
+
+    var url = "http://" + options.host + ":" + options.port + options.path;
+    console.log(url);
+
+    http.get(url, (res) => {
+      const { statusCode } = res;
+      const contentType = res.headers['content-type'];
+
+      let error;
+      if (statusCode !== 200) {
+        error = new Error('Request Failed.\n' +
+                          `Status Code: ${statusCode}`);
+      } else if (!/^application\/json/.test(contentType)) {
+        error = new Error('Invalid content-type.\n' +
+                          `Expected application/json but received ${contentType}`);
+      }
+      if (error) {
+        console.error(error.message);
+        // consume response data to free up memory
+        res.resume();
+        return;
+      }
+
+      res.setEncoding('utf8');
+      let rawData = '';
+      res.on('data', (chunk) => {
+        rawData += chunk;
+      });
+      res.on('end', () => {
+        try {
+          const parsedData = JSON.parse(rawData);
+          dataMeasurement.push(parsedData["results"][0]["series"][0]["name"]);
+          parsedData["results"][0]["series"][0]["values"].forEach((data) => {
+            dataMeasurement.push(data);
+          });
+          console.log(dataMeasurement);
+          resolve(dataMeasurement);
+        } catch (e) {
+          console.error(e.message);
+        }
+      });
+    }).on('error', (e) => {
+      console.error(`Got error: ${e.message}`);
+    });
   });
 }
 
