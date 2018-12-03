@@ -18,11 +18,12 @@ var http = require('http');
 //pour localDB: NOAA_water_database
 //measurements: 'average_temperature','h2o_feet','h2o_pH','h2o_quality','h2o_temperature'
 
-var dataTable = new Array();
 var listMeasurements = new Array();
 var nameColumns = new Array();
-var dataMeasurement = new Array();
-var dataCSV = "";
+var dateCreation = new Date().getTime();
+var nameFile = "data" + dateCreation + ".csv";
+var wstream = fs.createWriteStream("./CSVDownload/" + nameFile.toString());
+
 
 //fonctionne une fois sur 2
 //main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
@@ -40,36 +41,32 @@ exports.measurementsCampaignGET = async(campaign) => {
       console.log(listMeasurements);
       await getColumnsName(listMeasurements[0][0], campaign).then( async() => {
         console.log(nameColumns);
+        await getCSV(nameColumns);
         await asyncForEach(listMeasurements, async(measurement) => {
-          await getDataFromMeasurement(measurement, campaign).then( async () => {
-            await dataTable.push(dataMeasurement);
-            dataMeasurement = [];
-          });
+          await getDataFromMeasurement(measurement, campaign);
+          //.then( async () => {
+            //await getCSV(dataMeasurement);
+            //dataMeasurement = [];
+          //});
         });
       });
-    }).then(async () => {
-      await console.log(dataTable[1]);
-      await dataTable.splice(0,0,nameColumns);
-      var end = new Date().getTime();
-      console.log("end " + end);
-      console.log("durée du programme: " + Math.abs(end - start)/60000);
-      await jsonexport(dataTable,function(err, csv){
-        if(err) {
-          console.log("nul");
-          return console.log(err);
-        }
-        console.log("csv : \n" + csv );
-        dataCSV = csv;
-        return csv;
-      });
-      resolve(dataCSV);
+    //}).then(async () => {
+      //console.log(dataCSV);
+      //resolve(dataCSV);
     }).then(async() => {
-      var dateCreation = new Date().getTime();
+      wstream.on('finish', function () {
+        console.log('file has been written');
+      });
+      wstream.end();
+      /*var dateCreation = new Date().getTime();
       var nameFile = "data" + dateCreation + ".csv";
       await fs.writeFile("./CSVDownload/" + nameFile.toString(), dataCSV, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
-      });
+      });*/
+      var end = new Date().getTime();
+      console.log("end " + end);
+      console.log("durée du programme: " + Math.abs(end - start)/60000);
     }).catch ( async (err) => {
       console.log(err);
       reject(err);
@@ -186,7 +183,7 @@ const getColumnsName = async (measurement, campaign) => {
 
 const getDataFromMeasurement = async (measurement, campaign) => {
   return new Promise((resolve, reject) => {
-    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 1");
+    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 200000");
     var options = {
       host: "apolline.lille.inria.fr",
       port: 8086,
@@ -225,11 +222,10 @@ const getDataFromMeasurement = async (measurement, campaign) => {
         try {
           const parsedData = JSON.parse(rawData);
           //dataMeasurement.push(parsedData["results"][0]["series"][0]["name"]);
-          parsedData["results"][0]["series"][0]["values"][0].forEach((data) => {
-            dataMeasurement.push(data);
-          });
-          console.log(dataMeasurement);
-          resolve(dataMeasurement);
+          getCSV(parsedData["results"][0]["series"][0]["values"]);
+          //dataMeasurement.push(parsedData["results"][0]["series"][0]["values"]);
+          //console.log(dataMeasurement);
+          resolve(wstream);
         } catch (e) {
           console.error(e.message);
         }
@@ -247,6 +243,13 @@ const asyncForEach = async (array, callback) =>{
 }
 
 
-const avancement = async (i) =>{
-  console.log(i);
+const getCSV = async (dataArray) =>{
+  await jsonexport(dataArray,function(err, csv){
+    if(err) {
+      console.log("nul");
+      return console.log(err);
+    }
+    wstream.write(csv.toString());
+    return csv;
+  });
 }
