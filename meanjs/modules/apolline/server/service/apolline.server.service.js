@@ -29,7 +29,7 @@ var wstream = fs.createWriteStream("./CSVDownload/" + nameFile.toString());
 //main function launch when we wrote "curl http://0.0.0.0:80/measurements/{database}"
 
 //requête à passer en node
-//"curl -G 'http://apolline.lille.inria.fr:8086/query?db=loa' --data-urlencode 'q=SELECT * FROM "pm.10.value"'"
+//"curl -G 'http://apolline.lille.inria.fr:8086/query?db=loa' --data-urlencode 'q=SELECT * FROM "pm.10.value" WHERE time >= "2017-06-12T00:00:00Z" and time <= "2017-06-13T00:00:00Z"'"
 
 
 exports.measurementsCampaignGET = async(campaign) => {
@@ -44,26 +44,13 @@ exports.measurementsCampaignGET = async(campaign) => {
         await getCSV(nameColumns);
         await asyncForEach(listMeasurements, async(measurement) => {
           await getDataFromMeasurement(measurement, campaign);
-          //.then( async () => {
-            //await getCSV(dataMeasurement);
-            //dataMeasurement = [];
-          //});
         });
       });
-    //}).then(async () => {
-      //console.log(dataCSV);
-      //resolve(dataCSV);
     }).then(async() => {
       wstream.on('finish', function () {
         console.log('file has been written');
       });
       wstream.end();
-      /*var dateCreation = new Date().getTime();
-      var nameFile = "data" + dateCreation + ".csv";
-      await fs.writeFile("./CSVDownload/" + nameFile.toString(), dataCSV, (err) => {
-        if (err) throw err;
-        console.log('The file has been saved!');
-      });*/
       var end = new Date().getTime();
       console.log("end " + end);
       console.log("durée du programme: " + Math.abs(end - start)/60000);
@@ -169,6 +156,7 @@ const getColumnsName = async (measurement, campaign) => {
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(rawData);
+          nameColumns.push("time");
           nameColumns.push(parsedData["results"][0]["series"][0]["values"]);
           resolve(nameColumns);
         } catch (e) {
@@ -183,7 +171,7 @@ const getColumnsName = async (measurement, campaign) => {
 
 const getDataFromMeasurement = async (measurement, campaign) => {
   return new Promise((resolve, reject) => {
-    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 200000");
+    var request = encodeURIComponent('SELECT * FROM \"" + measurement + "\" WHERE time >= \"2017-06-12T00:00:00Z\" and time <= \"2017-06-13T00:00:00Z\"');
     var options = {
       host: "apolline.lille.inria.fr",
       port: 8086,
@@ -208,7 +196,6 @@ const getDataFromMeasurement = async (measurement, campaign) => {
       }
       if (error) {
         console.error(error.message);
-        // consume response data to free up memory
         res.resume();
         return;
       }
@@ -221,10 +208,7 @@ const getDataFromMeasurement = async (measurement, campaign) => {
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(rawData);
-          //dataMeasurement.push(parsedData["results"][0]["series"][0]["name"]);
           getCSV(parsedData["results"][0]["series"][0]["values"]);
-          //dataMeasurement.push(parsedData["results"][0]["series"][0]["values"]);
-          //console.log(dataMeasurement);
           resolve(wstream);
         } catch (e) {
           console.error(e.message);

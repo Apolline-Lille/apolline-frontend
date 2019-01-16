@@ -1,0 +1,33 @@
+<nav class="navbar navbar-light">
+  <div class="container">
+    <a class="navbar-brand" routerLink="/">Apolline Science</a>
+  </div>
+</nav>
+<div _ngcontent-c0="" class="banner">
+  <div _ngcontent-c0="" class="container">
+    <h1 _ngcontent-c0="" class="logo-font">Apolline Science</h1>
+    <p _ngcontent-c0="">A place to convert a database into CSV</p>
+  </div>
+</div>
+<h4 style="margin-left:5%">Choose the DataBase</h4>
+<mat-form-field style="margin-left:5%">
+  <select matNativeControl required>
+    <option value="apolline">apolline</option>
+    <option value="connected-table">connected-table</option>
+    <option value="esp">esp</option>
+    <option value="loa">loa</option>
+    <option value="qarpediem">qarpediem</option>
+    <option value="sandbox">sandbox</option>
+    <option value="test">test</option>
+  </select>
+</mat-form-field>
+<button mat-raised-button color="primary" style="margin-left:5%">Generate</button>
+<footer>
+  <div class="container">
+    <a class="logo-font" routerLink="/">Apolline Science</a>
+    <span class="attribution">
+      &copy; {{ today | date: 'yyyy' }}.
+      A link to the InfluxDB API <a href="https://apolline.inria.fr:8083">Apolline</a>.
+    </span>
+  </div>
+</footer>
