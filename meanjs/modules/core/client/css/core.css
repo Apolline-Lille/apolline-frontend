@@ -22,16 +22,7 @@
 a:hover .header-profile-image {
   opacity: 1;
 }
-.user-header-dropdown-toggle {
-  padding-bottom: 11px !important;
-  padding-top: 11px !important;
-}
-.user-primary-account {
-  font-size: 30px;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
+
 .error-text {
   display: none;
 }
