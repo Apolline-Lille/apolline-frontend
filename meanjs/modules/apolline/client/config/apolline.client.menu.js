@@ -8,9 +8,10 @@
     menuConfig.$inject = ['menuService'];
 
     function menuConfig(menuService) {
-      menuService.addMenuItem('topbar', {
-        title: 'Apolline',
-        state: 'apolline'
-      });
+      /*menuService.addMenuItem('topbar', {
+        title: 'Generator',
+        state: 'apolline',
+        roles: ['*']
+      });*/
     }
   }());

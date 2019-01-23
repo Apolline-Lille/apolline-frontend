@@ -1,26 +1,40 @@
 <section>
-  <div class="jumbotron">
-    <h4 style="margin-left:5%">Choose the DataBase</h4>
-    <mat-form-field style="margin-left:5%">
-      <select matNativeControl required>
-        <option value="apolline">apolline</option>
-        <option value="connected-table">connected-table</option>
-        <option value="esp">esp</option>
-        <option value="loa">loa</option>
-        <option value="qarpediem">qarpediem</option>
-        <option value="sandbox">sandbox</option>
-        <option value="test">test</option>
-      </select>
-    </mat-form-field>
-    <button mat-raised-button color="primary" style="margin-left:5%">Generate</button>
-  </div>
-  <footer>
-    <div class="container">
-      <a class="logo-font" routerLink="/">Apolline Science</a>
-      <span class="attribution">
-        &copy; {{ today | date: 'yyyy' }}.
-        A link to the InfluxDB API <a href="https://apolline.inria.fr:8083">Apolline</a>.
-      </span>
+  <div class="jumbotron text-center">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 col-xs-12">
+        <h1>Apolline Science</h1>
+      </div>
     </div>
-  </footer>
+    <br>
+    <div class="row">
+      <p class="lead">
+        An app to generate CSV from Apolline Databases
+      </p>
+    </div>
+    <div class="row" ng-controller="HomeController">
+      <form ng-submit="ChooseDatabase()">
+        <div class="form-group">
+          <select name="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
+            <option value="apolline">apolline</option>
+            <option value="connected-table">connected-table</option>
+            <option value="esp">esp</option>
+            <option value="loa">loa</option>
+            <option value="qarpediem">qarpediem</option>
+            <option value="sandbox">sandbox</option>
+            <option value="test">test</option>
+          </select>
+          <button type="submit" ng-click="onClick()" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Show Database</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </section>
+<footer>
+  <div class="container">
+    <a class="logo-font" routerLink="/">Apolline Science</a>
+    <span class="attribution">
+      &copy; {{ today | date: 'yyyy' }}.
+      A link to the InfluxDB API <a href="https://apolline.inria.fr:8083">Apolline</a>.
+    </span>
+  </div>
+</footer>

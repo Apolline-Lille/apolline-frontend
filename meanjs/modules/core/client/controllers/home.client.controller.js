@@ -3,9 +3,17 @@
 
   angular
     .module('core')
-    .controller('HomeController', HomeController);
-
-  function HomeController() {
-    var vm = this;
-  }
+    .controller('HomeController', function($scope){
+      $scope.ChooseDatabase = function(){
+        console.log($scope.databaseName);
+      }
+      $scope.onClick = function(){
+        if ($scope.databaseName!=null){
+          window.location = "./measurements";
+        }
+        else{
+          alert("Veuillez choisir une base de données");
+        }
+      }
+    }); 
 }());

@@ -1,33 +1,49 @@
-<nav class="navbar navbar-light">
-  <div class="container">
-    <a class="navbar-brand" routerLink="/">Apolline Science</a>
+<section>
+  <br/>
+  <br/>
+  <div>
+    <div ng-controller="TableCtrl">
+      <div class="input-group">
+        <input class="form-control" ng-model="searchText" placeholder="Search" type="search" ng-change="search()" /> <span class="input-group-addon">
+      <span class="glyphicon glyphicon-search"></span>
+      </span>
+      </div>
+      <table class="table  table-hover data-table myTable">
+        <thead>
+            <tr>
+                <th class="EmpId"> <a href="#" ng-click="sort('EmpId',$event)">EmpId
+                    <span class="{{Header[0]}}"></span>
+                    </a>
+
+                </th>
+                <th class="name"> <a ng-click="sort('name')" href="#"> Name
+                    <span class="{{Header[1]}}"></span></a>
+                </th>
+                <th class="Email"> <a ng-click="sort('Email')" href="#"> Email
+                <span class="{{Header[2]}}"></span></a>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="item in ItemsByPage[currentPage] | orderBy:columnToOrder:reverse">
+                <td>{{item.EmpId}}</td>
+                <td>{{item.name}}</td>
+                <td>{{item.Email}}</td>
+            </tr>
+        </tbody>
+      </table>
+      <ul class="pagination pagination-sm">
+          <li ng-class="{active:0}"><a href="#" ng-click="firstPage()">First</a>
+
+          </li>
+          <li ng-repeat="n in range(ItemsByPage.length)"> <a href="#" ng-click="setPage()" ng-bind="n+1">1</a>
+
+          </li>
+          <li><a href="#" ng-click="lastPage()">Last</a>
+
+          </li>
+      </ul>
+    </div>
+      <!-- Ends Controller -->
   </div>
-</nav>
-<div _ngcontent-c0="" class="banner">
-  <div _ngcontent-c0="" class="container">
-    <h1 _ngcontent-c0="" class="logo-font">Apolline Science</h1>
-    <p _ngcontent-c0="">A place to convert a database into CSV</p>
-  </div>
-</div>
-<h4 style="margin-left:5%">Choose the DataBase</h4>
-<mat-form-field style="margin-left:5%">
-  <select matNativeControl required>
-    <option value="apolline">apolline</option>
-    <option value="connected-table">connected-table</option>
-    <option value="esp">esp</option>
-    <option value="loa">loa</option>
-    <option value="qarpediem">qarpediem</option>
-    <option value="sandbox">sandbox</option>
-    <option value="test">test</option>
-  </select>
-</mat-form-field>
-<button mat-raised-button color="primary" style="margin-left:5%">Generate</button>
-<footer>
-  <div class="container">
-    <a class="logo-font" routerLink="/">Apolline Science</a>
-    <span class="attribution">
-      &copy; {{ today | date: 'yyyy' }}.
-      A link to the InfluxDB API <a href="https://apolline.inria.fr:8083">Apolline</a>.
-    </span>
-  </div>
-</footer>
+</section> 

@@ -17,7 +17,7 @@
         .state('apolline.view', {
           url:'',
           templateUrl: '/modules/apolline/client/views/apolline.component.html',
-          controller: 'ApollineController',
+          controller: 'TableCtrl',
           controllerAs: 'vm'
         })
     }
