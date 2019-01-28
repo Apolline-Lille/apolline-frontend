@@ -11,14 +11,26 @@
       $stateProvider
         .state('apolline', {
           abstract: true,
-          url: '/measurements',
+          url: '/measurements/:campaign',
           template: '<ui-view/>'
         })
-        .state('apolline.view', {
+        .state('apolline.measurements', {
           url:'',
           templateUrl: '/modules/apolline/client/views/apolline.component.html',
-          controller: 'TableCtrl',
-          controllerAs: 'vm'
+          controller: 'getMeasurements',
+          controllerAs: 'vm',
+          data: {
+            pageTitle: "Choose Measurements"
+          }
+        })
+        .state('apolline.tag', {
+          url: '/tags',
+          templateUrl: '/modules/apolline/client/views/apolline-tag.component.html',
+          controller: 'getTags',
+          controllerAs: 'vm',
+          data: {
+            pageTitle: "Choose Tags"
+          }
         })
     }
   }());
