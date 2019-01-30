@@ -17,7 +17,7 @@
         .state('apolline.measurements', {
           url:'',
           templateUrl: '/modules/apolline/client/views/apolline.component.html',
-          controller: 'getMeasurements',
+          controller: 'MeasurementController',
           controllerAs: 'vm',
           data: {
             pageTitle: "Choose Measurements"
@@ -26,7 +26,7 @@
         .state('apolline.tag', {
           url: '/tags',
           templateUrl: '/modules/apolline/client/views/apolline-tag.component.html',
-          controller: 'getTags',
+          controller: 'TagsController',
           controllerAs: 'vm',
           data: {
             pageTitle: "Choose Tags"

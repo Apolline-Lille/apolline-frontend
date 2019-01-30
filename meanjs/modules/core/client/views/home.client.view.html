@@ -11,22 +11,78 @@
         An app to generate CSV from Apolline Databases
       </p>
     </div>
-    <div class="row" ng-controller="HomeController">
-      <form ng-submit="ChooseDatabase()">
-        <div class="form-group">
-          <select name="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
-            <option value="_internal">_internal</option>
-            <option value="esp">esp</option>
-            <option value="loa">loa</option>
-            <option value="qarpediem">qarpediem</option>
-            <option value="sandbox">sandbox</option>
-            <option value="test">test</option>
-          </select>
-          <button type="submit" ng-click="onClick()" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Show Database</button>
+    <hr>
+    <button type="button" class="btn btn-default" ng-click="isCollapsedDB = !isCollapsedDB">1. Choose Database</button>
+    <hr>
+    <div id="collapsedDB" uib-collapse="!isCollapsedDB">
+      <div class="well well-lg">
+        <div class="row">
+          <form ng-submit="ChooseDatabase()">
+            <div class="form-group">
+              <select name="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
+                <option value="_internal">_internal</option>
+                <option value="esp">esp</option>
+                <option value="loa">loa</option>
+                <option value="qarpediem">qarpediem</option>
+                <option value="sandbox">sandbox</option>
+                <option value="test">test</option>
+              </select>
+              <button type="submit" ng-click="onClickDB()" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Submit</button>
+            </div>
+          </form>
         </div>
-      </form>
+      </div>
     </div>
-  </div>
+
+    <hr>
+    <button id="forMeasurement" type="button" class="btn btn-default" ng-click="isCollapsedMeasure = !isCollapsedMeasure" disabled>2. Choose the Measurements</button>
+    <hr>
+    <div id="collapsedMeasure" uib-collapse="!isCollapsedMeasure">
+      <div class="well well-lg">
+        <div class="row">
+          <form>
+            <div class="form-group">
+              <li ng-repeat="measurement in checkboxMeasurement">
+                  <input type="checkbox" class="measurementValue" value="{{measurement}}" checked> {{measurement}}
+              </li>
+              <button type="submit" ng-click="onClickMeasurements()" class="btn btn-success btn-lg" style="float:right">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+    <button id="forTags" type="button" class="btn btn-default" ng-click="isCollapsedTags = !isCollapsedTags" disabled>3. Choose the Tags</button>
+    <hr>
+    <div id="collapsedTags" uib-collapse="!isCollapsedTags">
+      <div class="well well-lg">
+        <div class="row">
+          <form>
+            <div class="form-group">
+                <ul ng-repeat="measureAndTags in tagsElements">
+                  <h4>{{measureAndTags.measurement}}</h4><br>
+                  <li ng-repeat="tag in measureAndTags.tags">
+                    <input type="checkbox" value="{{tag}}" checked> {{tag.toString()}}
+                  </li>
+                </ul>
+                <button type="submit" ng-click="onClickTags()" class="btn btn-success btn-lg" style="float:right">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <hr>
+    <button id="forDate" type="button" class="btn btn-default" ng-click="isCollapsedDate = !isCollapsedDate" disabled>4. Choose the date</button>
+    <hr>
+    <div id="collapsedDate" uib-collapse="!isCollapsedDate">
+      <div class="well well-lg">
+        Content
+      </div>
+    </div>
+  </div> 
+
 </section>
 <footer>
   <div class="container">
