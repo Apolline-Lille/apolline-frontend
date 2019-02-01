@@ -27,7 +27,7 @@
                 <option value="sandbox">sandbox</option>
                 <option value="test">test</option>
               </select>
-              <button type="submit" ng-click="onClickDB()" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Submit</button>
+              <button type="submit" id="onClickDB" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Submit</button>
             </div>
           </form>
         </div>
@@ -43,9 +43,9 @@
           <form>
             <div class="form-group">
               <li ng-repeat="measurement in checkboxMeasurement">
-                  <input type="checkbox" class="measurementValue" value="{{measurement}}" checked> {{measurement}}
+                  <input type="checkbox" class="measurementValue" value="{{measurement}}"> {{measurement}}
               </li>
-              <button type="submit" ng-click="onClickMeasurements()" class="btn btn-success btn-lg" style="float:right">Submit</button>
+              <button type="submit" id="onClickMeasurements" class="btn btn-success btn-lg" style="float:right">Submit</button>
             </div>
           </form>
         </div>
@@ -62,11 +62,11 @@
             <div class="form-group">
                 <ul ng-repeat="measureAndTags in tagsElements">
                   <h4>{{measureAndTags.measurement}}</h4><br>
-                  <li ng-repeat="tag in measureAndTags.tags">
-                    <input type="checkbox" value="{{tag}}" checked> {{tag.toString()}}
+                  <li ng-repeat="tag in measureAndTags.tags track by $index">
+                    <input type="checkbox" class="tagsValue" value="{{tag.toString()}}" checked>{{tag.toString()}}
                   </li>
                 </ul>
-                <button type="submit" ng-click="onClickTags()" class="btn btn-success btn-lg" style="float:right">Submit</button>
+                <button type="submit" id="onClickTags" class="btn btn-success btn-lg" style="float:right">Submit</button>
             </div>
           </form>
         </div>
@@ -78,7 +78,23 @@
     <hr>
     <div id="collapsedDate" uib-collapse="!isCollapsedDate">
       <div class="well well-lg">
-        Content
+        <div class="row">
+          <form>
+            <h4>Choose the period</h4>
+            <input type="checkbox" id="allData"> No filter with date
+            <br>
+            <br>
+            <h4>Beginning Date</h4>
+            <input type="date" id="beginningDate">
+            <br>
+            <br>
+            <h4>Ending Date</h4>
+            <input type="date" id="endingDate">
+            <br>
+            <br>
+            <button type="submit" id="generate" class="btn btn-success btn-lg" style="float:right">Generate CSV</button>
+          </form>
+        </div>
       </div>
     </div>
   </div> 

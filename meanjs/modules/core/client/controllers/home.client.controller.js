@@ -5,9 +5,9 @@
     .module('core')
     .controller('HomeController', function($scope, $http){
       
-      
+      var filterJSON = {};
 
-      $scope.onClickDB = function(){  
+      document.getElementById("onClickDB").onclick = function(){  
         localStorage.clear();
         if ($scope.databaseName!=null){
           localStorage.setItem("currentDB", $scope.databaseName);
@@ -17,6 +17,7 @@
           document.getElementById("collapsedDB").setAttribute("class","collapse");
           //URL to get the measurements from the database chosen
           document.getElementById('forMeasurement').onclick = function(){
+            
             var request = encodeURIComponent("SHOW MEASUREMENTS");
             var campaign = localStorage.getItem("currentDB");
             var options = {
@@ -36,6 +37,7 @@
               });
               console.log(finalList);
               $scope.checkboxMeasurement=finalList;
+              console.log(finalList);
             }).catch(function errorCallback(response){
               console.log(response)
             });
@@ -46,7 +48,7 @@
         }
       }
 
-      $scope.onClickMeasurements = function(){
+      document.getElementById("onClickMeasurements").onclick = function(){
         var measurementTags = new Array();
         var checkboxes =  document.getElementsByClassName('measurementValue');
         var selectionMeasurements = [];
@@ -76,7 +78,6 @@
               var listTags = response.data.results[0].series[0].values;
               return listTags;
             }).then((list) => {
-              console.log(list);
               var measureTags = {
                 "measurement": measurement,
                 "tags": list
@@ -90,7 +91,6 @@
           //URL to get the measurements from the database chosen
           document.getElementById('forTags').onclick = function(){
             $scope.tagsElements = measurementTags;
-            console.log("scope: " + $scope.tagsElements);
           }
         }
         else{
@@ -99,8 +99,41 @@
       }
 
 
-      $scope.onClickTags = function(){
-
+      document.getElementById("onClickTags").onclick = function(){
+        //Allowed the user to click on the next button to choose date
+        document.getElementById("forDate").disabled = false;
+        //close the collapsed Tags
+        document.getElementById("collapsedTags").setAttribute("class","collapse");
+        var checkboxes =  document.getElementsByClassName('tagsValue');
+        var selection = {};
+        selection.final = new Array();      
+        var listMeasureTags = $scope.tagsElements;
+        console.log("measure tags: " + listMeasureTags)
+        var tagsNb = 0;
+        listMeasureTags.forEach(elt => {
+          console.log("measurement: "+elt.measurement);
+          console.log("tags: "+elt.tags);
+          var choosenTags = new Array();
+          for (var i = tagsNb; i < tagsNb + elt.tags.length; i++){
+            if (checkboxes[i].checked){
+              console.log(checkboxes[i].value);
+              choosenTags.push(checkboxes[i].value);
+            }
+          }
+          selection.final.push({
+            "measurement": elt.measurement,
+            "choosenTags": choosenTags
+          });
+          tagsNb = tagsNb + elt.tags.length;
+          console.log("tagsNb: " + tagsNb);
+          console.log(selection);
+          //elt.tags = selectionTags;
+        })
+        /*for (var i = 0; i < checkboxes.length ; i++){
+            if (checkboxes[i].checked){
+                selectionTags.push(checkboxes[i].value);
+            }
+        }*/
       }
     });
 }());
