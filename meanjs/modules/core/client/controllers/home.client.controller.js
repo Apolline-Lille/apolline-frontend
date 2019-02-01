@@ -35,9 +35,7 @@
               list.forEach(element => {
                 finalList.push(element[0]);
               });
-              console.log(finalList);
               $scope.checkboxMeasurement=finalList;
-              console.log(finalList);
             }).catch(function errorCallback(response){
               console.log(response)
             });
@@ -65,7 +63,6 @@
           document.getElementById("collapsedMeasure").setAttribute("class","collapse");
           //Fill the map with the measurements and the associate tags
           selectionMeasurements.forEach(function(measurement) {
-            console.log(measurement);
             var request = encodeURIComponent("SHOW TAG KEYS FROM \"" + measurement + "\"");
             var campaign = localStorage.getItem("currentDB");
             var options = {
@@ -108,15 +105,11 @@
         var selection = {};
         selection.final = new Array();      
         var listMeasureTags = $scope.tagsElements;
-        console.log("measure tags: " + listMeasureTags)
         var tagsNb = 0;
         listMeasureTags.forEach(elt => {
-          console.log("measurement: "+elt.measurement);
-          console.log("tags: "+elt.tags);
           var choosenTags = new Array();
           for (var i = tagsNb; i < tagsNb + elt.tags.length; i++){
             if (checkboxes[i].checked){
-              console.log(checkboxes[i].value);
               choosenTags.push(checkboxes[i].value);
             }
           }
@@ -125,15 +118,63 @@
             "choosenTags": choosenTags
           });
           tagsNb = tagsNb + elt.tags.length;
-          console.log("tagsNb: " + tagsNb);
-          console.log(selection);
-          //elt.tags = selectionTags;
         })
-        /*for (var i = 0; i < checkboxes.length ; i++){
-            if (checkboxes[i].checked){
-                selectionTags.push(checkboxes[i].value);
-            }
-        }*/
+        localStorage.setItem("dataChoosen", JSON.stringify(selection.final));
       }
+
+      document.getElementById("generate").onclick = function(){
+        var campaign = localStorage.getItem("currentDB");
+        var dataFilter = JSON.parse(localStorage.getItem("dataChoosen"));
+        var dateBegin = "";
+        var dateEnd = "";
+        var options = {
+            host: "apolline.lille.inria.fr",
+            port: 8086,
+            path: "/query?db="+campaign+"&q=",
+        };
+        var urlFinal = "http://" + options.host + ":" + options.port + options.path;
+        var listRequest = new Array();
+        console.log(dataFilter);
+        dataFilter.forEach( elt => {
+          var tagString = "";
+          for (var i = 0; i < elt.choosenTags.length; i++){
+            console.log("tagString" + tagString);
+            console.log("i " + i);
+            if (i != ((elt.choosenTags.length)-1)){
+              tagString = tagString + elt.choosenTags[i] + ", ";
+            }
+            else {
+              tagString = tagString + elt.choosenTags[i];
+            }
+          }
+          urlFinal = urlFinal + "SELECT " + tagString + " FROM \"" + elt.measurement + "\"";
+          if (!(document.getElementById("allData").checked)){
+            if ((document.getElementById("beginDate").value != "")){
+              if ((document.getElementById("endDate").value != "")){
+                if ( document.getElementById("beginDate").value > document.getElementById("endDate").value ){
+                  alert("Begin date bigger than end date");
+                }
+                else {
+                  dateBegin = document.getElementById("beginDate").value + "T00:00:00Z";
+                  dateEnd = document.getElementById("endDate").value + "T00:00:00Z";
+                  urlFinal = urlFinal + " WHERE time > \'" + dateBegin + "\' AND time < \'" + dateEnd + "\'";
+                  listRequest.push(urlFinal);
+                }
+              }
+              else {
+                alert("Choose an ending date");
+              }
+            }
+            else {
+              alert("Choose a beginning date");
+            }           
+          }
+          else{
+            listRequest.push(urlFinal);
+          }
+        });
+        console.log(listRequest);
+        }
+        //date format 2017-03-01T00:16:18Z année-mois-jour
     });
 }());
