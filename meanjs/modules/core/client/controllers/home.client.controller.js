@@ -1,11 +1,8 @@
+
 (function () {
   'use strict';
-
-  angular
-    .module('core')
-    .controller('HomeController', function($scope, $http){
-      
-      var filterJSON = {};
+  var app = angular.module('core');
+    app.controller('HomeController', function($scope, $http){
 
       document.getElementById("onClickDB").onclick = function(){  
         localStorage.clear();
@@ -134,20 +131,19 @@
         };
         var urlFinal = "http://" + options.host + ":" + options.port + options.path;
         var listRequest = new Array();
-        console.log(dataFilter);
         dataFilter.forEach( elt => {
           var tagString = "";
           for (var i = 0; i < elt.choosenTags.length; i++){
-            console.log("tagString" + tagString);
-            console.log("i " + i);
             if (i != ((elt.choosenTags.length)-1)){
-              tagString = tagString + elt.choosenTags[i] + ", ";
+              tagString = tagString + elt.choosenTags[i].toString() + ", ";
             }
             else {
-              tagString = tagString + elt.choosenTags[i];
+              tagString = tagString + elt.choosenTags[i].toString();
             }
           }
-          urlFinal = urlFinal + "SELECT " + tagString + " FROM \"" + elt.measurement + "\"";
+          var request = "SELECT " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 5";
+          var requestEncode = encodeURIComponent(request);
+          urlFinal = urlFinal + requestEncode;
           if (!(document.getElementById("allData").checked)){
             if ((document.getElementById("beginDate").value != "")){
               if ((document.getElementById("endDate").value != "")){
@@ -157,7 +153,7 @@
                 else {
                   dateBegin = document.getElementById("beginDate").value + "T00:00:00Z";
                   dateEnd = document.getElementById("endDate").value + "T00:00:00Z";
-                  urlFinal = urlFinal + " WHERE time > \'" + dateBegin + "\' AND time < \'" + dateEnd + "\'";
+                  urlFinal = urlFinal + encodeURIComponent(" WHERE time > \'" + dateBegin + "\' AND time < \'" + dateEnd + "\'");
                   listRequest.push(urlFinal);
                 }
               }
@@ -173,8 +169,78 @@
             listRequest.push(urlFinal);
           }
         });
-        console.log(listRequest);
-        }
-        //date format 2017-03-01T00:16:18Z année-mois-jour
+        var i = 0;
+        asyncForEach(listRequest, async (url) => {
+          console.log(url);
+          await $http.get(url).then( async (response) => {
+            var result = response.data.results[i].series[0];
+            return result;            
+          }).then(async(json) => {
+            await JSONToCSVConvertor(json, json.name, true);
+            i++;
+          }).catch( async(err) => {
+            console.log(err);
+          });
+        });
+      }
     });
 }());
+
+function JSONToCSVConvertor(JSONData, ReportTitle, ShowLabel) {
+  
+  //If JSONData is not an object then JSON.parse will parse the JSON string in an Object
+  var arrData = typeof JSONData != 'object' ? JSON.parse(JSONData) : JSONData;
+  var CSV = '';
+  
+  
+  //Set Report title in first row or line 
+  CSV += ReportTitle + '\r\n\n';
+  console.log(ReportTitle);
+  //This condition will generate the Label/Header
+  if (ShowLabel) {
+    var row = "";     
+    //This loop will extract the label from 1st index of on array
+    (arrData.columns).forEach (index => {     
+      //Now convert each value to string and comma-seprated
+      row += index + ',';
+    });
+    row = row.slice(0, -1);      
+    //append Label row with line break
+    CSV += row + '\r\n';
+  }  
+  //1st loop is to extract each row
+  for (var i=0 ; i < (arrData.values).length; i++) {
+    var row = ""; 
+    //2nd loop will extract each column and convert it in string comma-seprated
+    arrData.values[i].forEach(index => {
+      row += '"' + index + '",';
+    });
+    row.slice(0, row.length - 1);
+    //add a line break after each row
+    CSV += row + '\r\n';
+  };
+  if (CSV == '') {        
+      alert("Invalid data");
+      return;
+  }  
+  //Initialize file format you want csv or xls
+  var uri = 'data:text/csv;charset=utf-8,' + escape(CSV);     
+  //this trick will generate a temp <a /> tag
+  var link = document.createElement("a");    
+  link.href = uri;  
+  //set the visibility hidden so it will not effect on your web-layout
+  var dateCreation = new Date().getTime();
+  var nameFile = ReportTitle + dateCreation + ".csv";
+  link.style = "visibility:hidden";
+  link.download = nameFile;  
+  //this part will append the anchor tag and remove it after automatic click
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
+const asyncForEach = async (array, callback) =>{
+  for (let index = 0; index < array.length; index++) {
+    await callback(array[index], index, array);
+  }
+}
