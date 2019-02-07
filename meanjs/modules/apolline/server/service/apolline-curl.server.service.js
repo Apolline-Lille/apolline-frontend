@@ -32,21 +32,32 @@ var dataCSV = "";
 //"curl -G 'http://apolline.lille.inria.fr:8086/query?db=loa' --data-urlencode 'q=SELECT * FROM "pm.10.value"'"
 
 
+//The file will be generate inside CSVDownload
 exports.measurementsCampaignGET = async(campaign) => {
   var start = new Date().getTime();
   console.log("début " + start);
+  var stream = fs.createWriteStream("/opt/mean.js/modules/apolline/server/CSVDownload/data" + start.toString() + ".csv");
   return new Promise(async (resolve, reject) => {
     console.log("Début fonction");
     await getMeasurements(campaign).then( async () => {
       console.log(listMeasurements);
       await getColumnsName(listMeasurements[0][0], campaign).then( async() => {
+        var columnString = ""
+        for(i = 0 ; i < nameColumns.length; i++){
+          if (i != ((nameColumns.length)-1)){
+            columnString = columnString + nameColumns[i] + ",";
+          }
+          else {
+            columnString = columnString + nameColumns[i] + "\n";
+          }
+        }
         console.log(nameColumns);
+        stream.write(columnString);
         await asyncForEach(listMeasurements, async(measurement) => {
-          await getDataFromMeasurement(measurement, campaign).then( async () => {
-            await dataTable.push(dataMeasurement);
-            dataMeasurement = [];
-          });
+          await getDataFromMeasurement(measurement, campaign);
         });
+        await stream.end();
+        return resolve();
       });
     }).then(async () => {
       await console.log(dataTable[1]);
@@ -67,7 +78,7 @@ exports.measurementsCampaignGET = async(campaign) => {
     }).then(async() => {
       var dateCreation = new Date().getTime();
       var nameFile = "data" + dateCreation + ".csv";
-      await fs.writeFile("./CSVDownload/" + nameFile.toString(), dataCSV, (err) => {
+      await fs.writeFileSync(__dirname + "/CSVDownload/" + nameFile.toString(), dataCSV, (err) => {
         if (err) throw err;
         console.log('The file has been saved!');
       });
@@ -187,7 +198,7 @@ const getColumnsName = async (measurement, campaign) => {
 
 const getDataFromMeasurement = async (measurement, campaign) => {
   return new Promise((resolve, reject) => {
-    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 1");
+    var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 5");
     var options = {
       host: "apolline.lille.inria.fr",
       port: 8086,
@@ -226,11 +237,19 @@ const getDataFromMeasurement = async (measurement, campaign) => {
         try {
           const parsedData = JSON.parse(rawData);
           //dataMeasurement.push(parsedData["results"][0]["series"][0]["name"]);
-          parsedData["results"][0]["series"][0]["values"][0].forEach((data) => {
-            dataMeasurement.push(data);
-          });
-          console.log(dataMeasurement);
-          resolve(dataMeasurement);
+          (parsedData.results[0].series[0].values).forEach(async (data) => {
+            var dataLine="";
+            for (var i = 0; i < data.length; i++){
+                if (i != ((data.length)-1)){
+                    dataLine = dataLine + data[i] + ",";
+                }
+                else {
+                    dataLine = dataLine + data[i];
+                }
+            }
+            stream.write(dataLine + "\n");
+        });
+        resolve();
         } catch (e) {
           console.error(e.message);
         }
@@ -245,9 +264,4 @@ const asyncForEach = async (array, callback) =>{
   for (let index = 0; index < array.length; index++) {
     await callback(array[index], index, array);
   }
-}
-
-
-const avancement = async (i) =>{
-  console.log(i);
 }

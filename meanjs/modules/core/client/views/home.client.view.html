@@ -34,7 +34,7 @@
       </div>
     </div>
 
-    <hr>
+    
     <button id="forMeasurement" type="button" class="btn btn-default" ng-click="isCollapsedMeasure = !isCollapsedMeasure" disabled>2. Choose the Measurements</button>
     <hr>
     <div id="collapsedMeasure" uib-collapse="!isCollapsedMeasure">
@@ -42,31 +42,32 @@
         <div class="row">
           <form>
             <div class="form-group">
-              <li ng-repeat="measurement in checkboxMeasurement">
+              <li ng-repeat="measurement in checkboxMeasurement" style="width:50%; float:left;">
                   <input type="checkbox" class="measurementValue" value="{{measurement}}"> {{measurement}}
               </li>
-              <button type="submit" id="onClickMeasurements" class="btn btn-success btn-lg" style="float:right">Submit</button>
+              <button type="submit" id="onClickMeasurements" class="btn btn-success btn-lg" style="float:right; margin-top: 5px">Submit</button>
             </div>
           </form>
         </div>
       </div>
     </div>
 
-    <hr>
+    
     <button id="forTags" type="button" class="btn btn-default" ng-click="isCollapsedTags = !isCollapsedTags" disabled>3. Choose the Tags</button>
-    <hr>
+    
     <div id="collapsedTags" uib-collapse="!isCollapsedTags">
       <div class="well well-lg">
         <div class="row">
           <form>
             <div class="form-group">
-                <ul ng-repeat="measureAndTags in tagsElements">
-                  <h4>{{measureAndTags.measurement}}</h4><br>
-                  <li ng-repeat="tag in measureAndTags.tags track by $index">
-                    <input type="checkbox" class="tagsValue" value="{{tag.toString()}}" checked>{{tag.toString()}}
-                  </li>
-                </ul>
-                <button type="submit" id="onClickTags" class="btn btn-success btn-lg" style="float:right">Submit</button>
+              <h3>Choose the tags</h3>
+              <ul ng-repeat="measureAndTags in tagsElements" style="width:50%; float:left">
+                <h4>{{measureAndTags.measurement}}</h4><br>
+                <li ng-repeat="tag in measureAndTags.tags track by $index">
+                  <input type="checkbox" class="tagsValue" value="{{tag.toString()}}" checked>{{tag.toString()}}
+                </li>
+              </ul>
+              <button type="submit" id="onClickTags" class="btn btn-success btn-lg" style="float:right;">Submit</button>
             </div>
           </form>
         </div>
@@ -75,7 +76,6 @@
 
     <hr>
     <button id="forDate" type="button" class="btn btn-default" ng-click="isCollapsedDate = !isCollapsedDate" disabled>4. Choose the date</button>
-    <hr>
     <div id="collapsedDate" uib-collapse="!isCollapsedDate">
       <div class="well well-lg">
         <div class="row">
@@ -92,7 +92,10 @@
             <input type="date" id="endDate">
             <br>
             <br>
-            <button type="submit" id="generate" class="btn btn-success btn-lg" style="float:right">Generate CSV</button>
+            <button type="submit" id="generate" class="btn btn-success btn-lg" style="float:right">
+              Generate CSV
+            </button>
+            <a class="btn" ng-href="{{ url }}" hidden></a>
           </form>
         </div>
       </div>

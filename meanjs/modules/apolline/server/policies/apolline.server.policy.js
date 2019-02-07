@@ -17,17 +17,26 @@ exports.invokeRolesPolicies = function () {
     allows: [{
       resources: '/measurements/:campaign',
       permissions: '*'
+    },{
+      resources: '/measurements/:campaign/data',
+      permissions: '*'
     }]
   }, {
     roles: ['user'],
     allows: [{
       resources: '/measurements/:campaign',
       permissions: '*'
+    },{
+      resources: '/measurements/:campaign/data',
+      permissions: '*'
     }]
   }, {
     roles: ['guest'],
     allows: [{
       resources: '/measurements/:campaign',
+      permissions: '*'
+    },{
+      resources: '/measurements/:campaign/data',
       permissions: '*'
     }]
   }]);

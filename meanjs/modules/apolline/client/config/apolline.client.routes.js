@@ -11,7 +11,7 @@
       $stateProvider
         .state('apolline', {
           abstract: true,
-          url: '/measurements/:campaign',
+          url: '/measurements',
           template: '<ui-view/>'
         })
         .state('apolline.measurements', {
@@ -21,15 +21,6 @@
           controllerAs: 'vm',
           data: {
             pageTitle: "Choose Measurements"
-          }
-        })
-        .state('apolline.tag', {
-          url: '/tags',
-          templateUrl: '/modules/apolline/client/views/apolline-tag.component.html',
-          controller: 'TagsController',
-          controllerAs: 'vm',
-          data: {
-            pageTitle: "Choose Tags"
           }
         })
     }
