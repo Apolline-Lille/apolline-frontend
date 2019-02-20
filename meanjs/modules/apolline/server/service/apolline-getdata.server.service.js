@@ -2,7 +2,6 @@
 
 'use strict';
 
-var jsonexport = require('jsonexport/dist');
 var fs = require('fs');
 var http = require('http');
 
@@ -15,15 +14,16 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
     return new Promise(async (resolve, reject) => {
         await asyncForEach(listURL, async(urlMeasurement) => {
             console.log(urlMeasurement);
-            await getDataFromMeasurement(urlMeasurement);
+            await getDataFromMeasurement(urlMeasurement, stream);
         });
-        await stream.end();
-        console.log("namefile: " + nameFile);
-        console.log("namefile toString: " + nameFile.toString());
-        return resolve(nameFile);
+        stream.on("finish", function() {
+            console.log("file uploaded");
+            stream.end();
+        });
+        return resolve(nameFile);     
     });
 }
-const getDataFromMeasurement = async (url) => {
+const getDataFromMeasurement = async (url, stream) => {
   return new Promise((resolve, reject) => {
     http.get(url, (res) => {
         const { statusCode } = res;
@@ -61,9 +61,11 @@ const getDataFromMeasurement = async (url) => {
                             dataLine = dataLine + data[i];
                         }
                     }
-                    stream.write(dataLine + "\n");
+                    await stream.write(dataLine + "\n");
+                    await stream.write("");
                 });
-                resolve();
+                
+                resolve(stream.write(""));
             } catch (e) {
                 console.error(e.message);
             }

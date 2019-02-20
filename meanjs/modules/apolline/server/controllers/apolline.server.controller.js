@@ -30,9 +30,6 @@ exports.getData = function getData(req, res, next){
   console.log("nameFile " + nameFile);
   ApollineData.getData(listRequest, stringTags, nameFile)
     .then(function (response){
-      console.log("serveur controller res: " + res);
-      console.log("serveur controller req: " + req);
-      console.log("serveur controller response: " + response);
       //utils.writeCSV(res, response);
       var filePath = path.join('/opt/mean.js/modules/apolline/server/CSVDownload/', response);
       var stat = fs.statSync(filePath);

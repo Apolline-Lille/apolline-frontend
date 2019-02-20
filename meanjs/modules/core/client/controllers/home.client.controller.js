@@ -185,17 +185,17 @@
           .success(
               function(success){
                   console.log("well done!");
-                  var date = new Date().getTime();
-			            var blob = new Blob([success], { type:"text/plain;charset=utf-8;" });			
+                  //var date = new Date().getTime();
+			            var blob = new Blob([success], { type:"text/csv;charset=utf-8;" });			
 			            var downloadLink = angular.element('<a></a>');
                   downloadLink.attr('href',window.URL.createObjectURL(blob));
-                  downloadLink.attr('download', 'data' + date.toString() + '.csv');
+                  downloadLink.attr('download', nameFile);
 			            downloadLink[0].click();
               }
             )
             .error(
               function(error){
-                console.log(error)
+                console.log(error);
               }
             );
         }    
