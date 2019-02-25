@@ -2,83 +2,113 @@
   <div class="jumbotron text-center">
     <div class="row">
       <div class="col-md-6 col-md-offset-3 col-sm-6 col-sm-offset-3 col-xs-12">
-        <img alt="MEAN.JS" class="img-responsive text-center" src="/modules/core/client/img/brand/logo.png" />
+        <h1>Apolline Science</h1>
       </div>
     </div>
     <br>
     <div class="row">
       <p class="lead">
-        Arthur's Open-Source Full-Stack Solution For MEAN Applications
+        An app to generate CSV from Apolline Databases
       </p>
     </div>
-    <div class="row">
-      <p>
-        <a class="btn btn-primary btn-lg" href="https://meanjs.org" target="_blank" rel="noopener">Learn more</a>
-      </p>
+    <hr>
+    <button type="button" class="btn btn-default" ng-click="isCollapsedDB = !isCollapsedDB">1. Choose Database</button>
+    <hr>
+    <div id="collapsedDB" uib-collapse="!isCollapsedDB">
+      <div class="well well-lg">
+        <div class="row">
+          <form ng-submit="ChooseDatabase()">
+            <div class="form-group">
+              <select name="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
+                <option value="_internal">_internal</option>
+                <option value="esp">esp</option>
+                <option value="loa">loa</option>
+                <option value="qarpediem">qarpediem</option>
+                <option value="sandbox">sandbox</option>
+                <option value="test">test</option>
+              </select>
+              <button type="submit" id="onClickDB" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-  </div>
-  <div>
-    <h2>Congrats! You've configured and run the sample application.</h2>
-    <p>MEAN.JS is a web application boilerplate, which means you should start changing everything :-)</p>
-    <p>This sample application tracks users and articles.</p>
-    <ul>
-      <li>
-        Click
-        <em>Sign Up</em> to get started.
-      </li>
-      <li>
-        Configure your app to work with your social accounts, by editing the
-        <em>/config/env/*.js</em> files.
-      </li>
-      <li>
-        Edit your users module.
-      </li>
-      <li>
-        Add new CRUD modules.
-      </li>
-      <li>
-        Have fun...
-      </li>
-    </ul>
-  </div>
-  <div class="row">
-    <div class="col-md-3">
-      <h2><strong>M</strong>ongoDB</h2>
-      <p><a target="_blank" href="https://www.mongodb.com/" rel="noopener">MongoDB</a> is a NoSQL database. MongoDB's <a target="_blank" href="https://docs.mongodb.com/manual/" rel="noopener">great manual</a> is the place to get started with NoSQL and MongoDB.</p>
+
+    
+    <button id="forMeasurement" type="button" class="btn btn-default" ng-click="isCollapsedMeasure = !isCollapsedMeasure" disabled>2. Choose the Measurements</button>
+    <hr>
+    <div id="collapsedMeasure" uib-collapse="!isCollapsedMeasure">
+      <div class="well well-lg">
+        <div class="row">
+          <form>
+            <div class="form-group">
+              <li ng-repeat="measurement in checkboxMeasurement" style="width:50%; float:left;">
+                  <input type="checkbox" class="measurementValue" value="{{measurement}}"> {{measurement}}
+              </li>
+              <button type="submit" id="onClickMeasurements" class="btn btn-success btn-lg" style="float:right; margin-top: 5px">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="col-md-3">
-      <h2><strong>E</strong>xpress</h2>
-      <p><a target="_blank" href="https://expressjs.com/" rel="noopener"> Express</a> is a NodeJS server-side application web framework. Check out <a target="_blank" href="https://expressjs.com/en/4x/api.html" rel="noopener">The ExpressJS API reference for more information</a>.</p>
+
+    
+    <button id="forTags" type="button" class="btn btn-default" ng-click="isCollapsedTags = !isCollapsedTags" disabled>3. Choose the Tags</button>
+    
+    <div id="collapsedTags" uib-collapse="!isCollapsedTags">
+      <div class="well well-lg">
+        <div class="row">
+          <form>
+            <div class="form-group">
+              <h3>Choose the tags</h3>
+              <ul ng-repeat="measureAndTags in tagsElements" style="width:50%; float:left">
+                <h4>{{measureAndTags.measurement}}</h4><br>
+                <li ng-repeat="tag in measureAndTags.tags track by $index">
+                  <input type="checkbox" class="tagsValue" value="{{tag.toString()}}" checked>{{tag.toString()}}
+                </li>
+              </ul>
+              <button type="submit" id="onClickTags" class="btn btn-success btn-lg" style="float:right;">Submit</button>
+            </div>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="col-md-3">
-      <h2><strong>A</strong>ngularJS</h2>
-      <p><a target="_blank" href="https://angularjs.org/" rel="noopener">AngularJS</a> is client-side web application framework. The <a target="_blank" href="https://thinkster.io/" rel="noopener">Thinkster Popular Guide</a> and <a target="_blank" href="https://egghead.io/" rel="noopener">Egghead Videos</a> are great resources.</p>
+
+    <hr>
+    <button id="forDate" type="button" class="btn btn-default" ng-click="isCollapsedDate = !isCollapsedDate" disabled>4. Choose the date</button>
+    <div id="collapsedDate" uib-collapse="!isCollapsedDate">
+      <div class="well well-lg">
+        <div class="row">
+          <form>
+            <h4>Choose the period</h4>
+            <input type="checkbox" id="allData"> No filter with date
+            <br>
+            <br>
+            <h4>Beginning Date</h4>
+            <input type="date" id="beginDate">
+            <br>
+            <br>
+            <h4>Ending Date</h4>
+            <input type="date" id="endDate">
+            <br>
+            <br>
+            <button type="submit" id="generate" class="btn btn-success btn-lg" style="float:right">
+              Generate CSV
+            </button>
+            <a class="btn" ng-href="{{ url }}" hidden></a>
+          </form>
+        </div>
+      </div>
     </div>
-    <div class="col-md-3">
-      <h2><strong>N</strong>ode.js</h2>
-      <p><a target="_blank" href="https://nodejs.org/" rel="noopener">Node.js</a> is a JavaScript run-time, popular for being a web server platform. Node's website and this <a target="_blank" href="https://stackoverflow.com/questions/2353818/how-do-i-get-started-with-node-js" rel="noopener">stackOverflow thread</a> offer excellent starting points to get to grasps with node.</p>
-    </div>
-  </div>
-  <div class="well">
-    <h2>MEAN.JS Documentation</h2>
-    <p>
-      Once you're familiar with the foundation technology, check out the MEAN.JS Documentation:
-      <ul>
-        <li><a target="_blank" href="https://meanjs.org/docs.html" rel="noopener">MEAN.JS Documentation</a>
-        </li>
-        <!-- <li><a target="_blank" href="https://meanjs.org/generator.html" rel="noopener">Yeoman Generator</a>
-				</li> -->
-        <li><a target="_blank" href="https://meanjs.org/modules.html" rel="noopener">Modules</a>
-        </li>
-        <li><a target="_blank" href="https://meanjs.org/changelog.html" rel="noopener">Changelog</a>
-        </li>
-        <li><a target="_blank" href="https://meanjs.org/community.html" rel="noopener">Community</a>
-        </li>
-        <li><a target="_blank" href="http://blog.meanjs.org" rel="noopener">Blog</a>
-        </li>
-      </ul>
-    </p>
-  </div>
-  <br>Enjoy &amp; Keep Us Updated,
-  <br>The MEAN.JS Team.
+  </div> 
+
 </section>
+<footer>
+  <div class="container">
+    <a class="logo-font" routerLink="/">Apolline Science</a>
+    <span class="attribution">
+      &copy; {{ today | date: 'yyyy' }}.
+      A link to the InfluxDB API <a href="https://apolline.inria.fr:8083">Apolline</a>.
+    </span>
+  </div>
+</footer>
