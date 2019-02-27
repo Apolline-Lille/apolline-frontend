@@ -1,4 +1,4 @@
-import { fileURLToPath } from "url";
+
 
 (function () {
   'use strict';
@@ -189,13 +189,11 @@ import { fileURLToPath } from "url";
                   var zip_file_path = "/opt/mean.js/modules/apolline/server/CSVDownload/" + nameFile;
                   var zip_file_name = nameFile;
                   //var date = new Date().getTime();
-			            var blob = new Blob([success], {type:"text/csv"});			
+			            var blob = new Blob([success], {type:"application/zip"});			
 			            var downloadLink = angular.element('<a></a>');
-                  downloadLink.attr('href',zip_file_path);
-                  downloadLink.attr('download', zip_file_name);
+                  downloadLink.attr('href',window.URL.createObjectURL(blob));
+                  downloadLink.attr('download', "data.zip");
                   downloadLink[0].click();
-                  document.body.removeChild(downloadLink);
-
               }
             )
             .error(

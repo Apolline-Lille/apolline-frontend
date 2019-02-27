@@ -4,6 +4,7 @@
 
 var fs = require('fs');
 var http = require('http');
+var JSZip = require("jszip");
 
 
 
@@ -19,6 +20,11 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
         stream.on("finish", function() {
             console.log("file uploaded");
             stream.end();
+        });
+        var zip = new JSZip();
+        zip.file(file);
+        zip.generateAsync({type:"base64"}).then(function (base64) {
+            window.location = "data:application/zip;base64," + base64;
         });
         return resolve(nameFile);     
     });
