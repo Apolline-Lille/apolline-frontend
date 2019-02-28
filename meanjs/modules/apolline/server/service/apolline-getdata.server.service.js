@@ -5,12 +5,13 @@
 var fs = require('fs');
 var http = require('http');
 var JSZip = require("jszip");
+var zlib = require('zlib');
 
 
 
 exports.getData = async(listURL, tagsCSV, nameFile) => {
-    var file = "/opt/mean.js/modules/apolline/server/CSVDownload/" + nameFile;
-    var stream = fs.createWriteStream(file);
+    var path = "/opt/meanjs/public/CSVDownload/";
+    var stream = fs.createWriteStream(path + nameFile);
     await stream.write(tagsCSV + "\n");
     return new Promise(async (resolve, reject) => {
         await asyncForEach(listURL, async(urlMeasurement) => {
@@ -21,12 +22,15 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
             console.log("file uploaded");
             stream.end();
         });
-        var zip = new JSZip();
-        zip.file(file);
-        zip.generateAsync({type:"base64"}).then(function (base64) {
-            window.location = "data:application/zip;base64," + base64;
+        const fileContents = fs.createReadStream(path + nameFile);
+        const writeStream = fs.createWriteStream(path + nameFile + '.gz');
+        const zip = zlib.createGzip();
+        fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
+            if (err) return reject(err);
+            else resolve();
         });
-        return resolve(nameFile);     
+        fs.unlinkSync(path + nameFile);
+        return resolve(nameFile + '.gz');     
     });
 }
 const getDataFromMeasurement = async (url, stream) => {

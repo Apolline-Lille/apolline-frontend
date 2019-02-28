@@ -186,12 +186,14 @@
           .success(
               function(success){
                   console.log("well done!");
-                  var zip_file_path = "/opt/mean.js/modules/apolline/server/CSVDownload/" + nameFile;
+                  var zip_file_path = "/opt/meanjs/public/CSVDownload/" + nameFile;
                   var zip_file_name = nameFile;
+                  console.log('http://0.0.0.0:80' + zip_file_path)
                   //var date = new Date().getTime();
-			            var blob = new Blob([success], {type:"application/zip"});			
+                  getFile
+			            var blob = new Blob([success], {type:"application/zlip"});			
 			            var downloadLink = angular.element('<a></a>');
-                  downloadLink.attr('href',window.URL.createObjectURL(blob));
+                  downloadLink.attr('href',window.URL.createObjectURL('http://0.0.0.0:80' + zip_file_path));
                   downloadLink.attr('download', "data.zip");
                   downloadLink[0].click();
               }

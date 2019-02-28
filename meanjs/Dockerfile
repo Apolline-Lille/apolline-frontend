@@ -41,7 +41,7 @@ RUN sudo apt-get install -yq nodejs \
 
 
 # Install MEAN.JS Prerequisites
-RUN npm install --quiet -g gulp bower yo mocha karma-cli pm2 js-yaml connect swagger-tools express path http fs jsonexport jszip && npm cache clean --force
+RUN npm install --quiet -g gulp bower yo mocha karma-cli pm2 js-yaml connect swagger-tools express path http fs jsonexport zlib && npm cache clean --force
 RUN npm update
 
 RUN mkdir -p /opt/mean.js/public/lib
