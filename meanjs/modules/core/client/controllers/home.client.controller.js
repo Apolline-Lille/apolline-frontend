@@ -189,9 +189,14 @@
                   var zip_file_path = "/opt/mean.js/modules/apolline/client/CSVDownload/" + nameFile;
                   var zip_file_name = nameFile;
                   console.log("success: " + success);
-                  this.http.get(zip_file_path).subscribe(data => {
-                    console.log(data.text());
-                  })
+                  var xhr = new XMLHttpRequest();
+                  xhr.open("GET", zip_file_path, false);
+                  xhr.send();
+                  var result;
+                  if (xhr.status==200){
+                    result = xhr.responseXML();
+                  }
+                  console.log(result);
                   //var date = new Date().getTime();
 			            var blob = new Blob([success], {type:"application/gzip"});			
 			            var downloadLink = angular.element('<a></a>');
