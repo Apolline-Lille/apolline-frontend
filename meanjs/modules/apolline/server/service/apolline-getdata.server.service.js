@@ -10,7 +10,8 @@ var zlib = require('zlib');
 
 
 exports.getData = async(listURL, tagsCSV, nameFile) => {
-    var path = "/opt/meanjs/public/CSVDownload/";
+    console.log(__dirname);
+    var path = "/opt/mean.js/modules/apolline/server/CSVDownload/";
     var stream = fs.createWriteStream(path + nameFile);
     await stream.write(tagsCSV + "\n");
     return new Promise(async (resolve, reject) => {
@@ -18,18 +19,11 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
             console.log(urlMeasurement);
             await getDataFromMeasurement(urlMeasurement, stream);
         });
-        stream.on("finish", function() {
-            console.log("file uploaded");
-            stream.end();
+        await stream.on("finish", async function() {
+            await console.log("file uploaded");
+            await stream.end();  
         });
-        const fileContents = fs.createReadStream(path + nameFile);
-        const writeStream = fs.createWriteStream(path + nameFile + '.gz');
-        const zip = zlib.createGzip();
-        fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
-            if (err) return reject(err);
-            else resolve();
-        });
-        fs.unlinkSync(path + nameFile);
+        compressFile(path, nameFile);
         return resolve(nameFile + '.gz');     
     });
 }
@@ -90,4 +84,15 @@ const asyncForEach = async (array, callback) =>{
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
     }
+}
+
+const compressFile = async (path, nameFile) => {
+    const fileContents = fs.createReadStream(path + nameFile);
+    const writeStream = fs.createWriteStream(path + nameFile + '.gz');
+    const zip = zlib.createGzip();
+    fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
+        if (err) return reject(err);
+        else resolve();
+    });
+    fs.unlinkSync(path + nameFile);
 }
