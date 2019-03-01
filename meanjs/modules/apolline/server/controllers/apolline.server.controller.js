@@ -31,7 +31,7 @@ exports.getData = function getData(req, res, next){
   ApollineData.getData(listRequest, stringTags, nameFile)
     .then(function (response){
       //utils.writeCSV(res, response);
-      var filePath = path.join('/opt/mean.js/modules/apolline/server/CSVDownload/', response);
+      var filePath = path.join('/opt/mean.js/modules/apolline/client/CSVDownload/', response);
       var stat = fs.statSync(filePath);
       res.set('Content-Type', 'text/csv');
       res.set('Content-Length', stat.size);
