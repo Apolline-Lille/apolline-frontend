@@ -25,17 +25,20 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
         const fileContents = fs.createReadStream(path + nameFile);
         const writeStream = fs.createWriteStream(path + nameFile + '.gz');
         const zip = zlib.createGzip();
-        fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
+        console.log("ici");
+        await fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
             if (err) return reject(err);
             else resolve();
         });
-        fs.unlinkSync(path + nameFile);
+        await fs.unlinkSync(path + nameFile);
         var finalName = nameFile + '.gz';
         return resolve(finalName);     
     });
 }
 const getDataFromMeasurement = async (url, stream) => {
+    console.log("getDataFromMeasurement");
   return new Promise((resolve, reject) => {
+      console.log(url);
     http.get(url, (res) => {
         const { statusCode } = res;
         const contentType = res.headers['content-type'];
@@ -75,9 +78,10 @@ const getDataFromMeasurement = async (url, stream) => {
                     await stream.write(dataLine + "\n");
                     await stream.write("");
                 });
-                
+                console.log("before the end");
                 resolve(stream.write(""));
             } catch (e) {
+                console.log("erreur resolve");
                 console.error(e.message);
             }
         });

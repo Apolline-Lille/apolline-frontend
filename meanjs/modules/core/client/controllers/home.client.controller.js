@@ -5,6 +5,27 @@
   var app = angular.module('core');
     app.controller('HomeController', function($scope, $http){
       var listTags = "";
+
+      var request = encodeURIComponent("SHOW DATABASES");
+      var options = {
+          host: "apolline.lille.inria.fr",
+          port: 8086,
+          path: "/query?q="+request,
+      };
+      var urlDatabase = "http://" + options.host + ":" + options.port + options.path;
+      $http.get(urlDatabase).then(function successCallback(response){
+        var listDataBases = response.data.results[0].series[0].values;
+        return listDataBases;
+      }).then((list) => {
+        var databases = [];
+        list.forEach(db => {
+          databases.push(db[0]);
+        });
+        $scope.DBs = databases;
+      }).catch(function errorCallback(response){
+        console.log(response);
+      });
+
       document.getElementById("onClickDB").onclick = function(){  
         localStorage.clear();
         if ($scope.databaseName!=null){
@@ -186,20 +207,9 @@
           .success(
               function(success){
                   console.log("well done!");
-                  var zip_file_path = "/opt/mean.js/modules/apolline/client/CSVDownload/" + nameFile;
-                  var zip_file_name = nameFile;
                   console.log("success: " + success);
-                  var xhr = new XMLHttpRequest();
-                  xhr.open("GET", zip_file_path, false);
-                  xhr.send();
-                  var result;
-                  if (xhr.status==200){
-                    result = xhr.responseXML();
-                  }
-                  console.log(result);
-                  //var date = new Date().getTime();
 			            var blob = new Blob([success], {type:"application/gzip"});			
-			            var downloadLink = angular.element('<a></a>');
+                  var downloadLink = angular.element('<a></a>');
                   downloadLink.attr('href',window.URL.createObjectURL(blob));
                   downloadLink.attr('download', "data.zip");
                   downloadLink[0].click();

@@ -19,13 +19,8 @@
         <div class="row">
           <form ng-submit="ChooseDatabase()">
             <div class="form-group">
-              <select name="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
-                <option value="_internal">_internal</option>
-                <option value="esp">esp</option>
-                <option value="loa">loa</option>
-                <option value="qarpediem">qarpediem</option>
-                <option value="sandbox">sandbox</option>
-                <option value="test">test</option>
+              <select id="database" ng-model="databaseName" class="form-control" style="width:50%; float:left" required>
+                <option ng-repeat="db in DBs" value="{{db}}">{{db}}</option>
               </select>
               <button type="submit" id="onClickDB" class="btn btn-success btn-lg" target="_blank" rel="noopener" style="float:right">Submit</button>
             </div>
