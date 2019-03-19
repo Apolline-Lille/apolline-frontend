@@ -38,7 +38,7 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
 const getDataFromMeasurement = async (url, stream) => {
     console.log("getDataFromMeasurement");
   return new Promise((resolve, reject) => {
-      console.log(url);
+    console.log(url);
     http.get(url, (res) => {
         const { statusCode } = res;
         const contentType = res.headers['content-type'];
