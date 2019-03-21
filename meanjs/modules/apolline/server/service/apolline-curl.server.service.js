@@ -4,8 +4,9 @@
 var jsonexport = require('jsonexport/dist');
 var fs = require('fs');
 var http = require('http');
+var zlib = require('zlib');
 /**
- * Get all the dat
+ * Get all the data
  * 
  * 
  * a of the DataBase \"campaign\"
@@ -20,8 +21,8 @@ var http = require('http');
 //measurements: 'average_temperature','h2o_feet','h2o_pH','h2o_quality','h2o_temperature'
 
 var dataTable = new Array();
-var listMeasurements = new Array();
-var nameColumns = new Array();
+
+
 var dataMeasurement = new Array();
 var dataCSV = "";
 
@@ -34,16 +35,27 @@ var dataCSV = "";
 
 //The file will be generate inside CSVDownload
 exports.measurementsCampaignGET = async(campaign) => {
+  var listMeasurements = new Array();
+  var nameColumns = new Array();
+
+  //set the name of the file and it path
   var start = new Date().getTime();
   console.log("début " + start);
-  var stream = fs.createWriteStream("/opt/mean.js/modules/apolline/server/CSVDownload/data" + start.toString() + ".csv");
+  var nameFile = "data" + start + ".csv";
+  var path = "/opt/mean.js/modules/apolline/client/CSVDownload/";
+  var stream = fs.createWriteStream("/opt/mean.js/modules/apolline/client/CSVDownload/" + nameFile);
+
   return new Promise(async (resolve, reject) => {
     console.log("Début fonction");
-    await getMeasurements(campaign).then( async () => {
+
+    //get the measurement of the database "campaign"
+    await getMeasurements(campaign, listMeasurements).then( async () => {
       console.log(listMeasurements);
-      await getColumnsName(listMeasurements[0][0], campaign).then( async() => {
-        var columnString = ""
-        for(i = 0 ; i < nameColumns.length; i++){
+
+      //write the tags of the variable in the file
+      await getColumnsName(listMeasurements[0][0], campaign, nameColumns).then( async() => {
+        var columnString = "";
+        for(var i = 0 ; i < nameColumns.length; i++){
           if (i != ((nameColumns.length)-1)){
             columnString = columnString + nameColumns[i] + ",";
           }
@@ -54,12 +66,26 @@ exports.measurementsCampaignGET = async(campaign) => {
         console.log(nameColumns);
         stream.write(columnString);
         await asyncForEach(listMeasurements, async(measurement) => {
-          await getDataFromMeasurement(measurement, campaign);
+          await getDataFromMeasurement(measurement, campaign, stream);
         });
-        await stream.end();
-        return resolve();
+        await stream.on("finish", async function() {
+          await console.log("file uploaded");
+          await stream.end();  
+        });
+        
+        const fileContents = fs.createReadStream(path + nameFile);
+        const writeStream = fs.createWriteStream(path + nameFile + '.gz');
+        const zip = zlib.createGzip();
+        console.log("ici");
+        await fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
+            if (err) return reject(err);
+            else resolve();
+        });
+        await fs.unlinkSync(path + nameFile);
+        var finalName = nameFile + '.gz';
+        return resolve(finalName);     
       });
-    }).then(async () => {
+    })/*.then(async () => {s
       await console.log(dataTable[1]);
       await dataTable.splice(0,0,nameColumns);
       var end = new Date().getTime();
@@ -82,14 +108,14 @@ exports.measurementsCampaignGET = async(campaign) => {
         if (err) throw err;
         console.log('The file has been saved!');
       });
-    }).catch ( async (err) => {
+    })*/.catch ( async (err) => {
       console.log(err);
       reject(err);
     });   
   });
 }
 
-const getMeasurements = async (campaign) => {
+const getMeasurements = async (campaign, listMeasurements) => {
   return new Promise((resolve, reject) => {
     var request = encodeURIComponent("SHOW MEASUREMENTS");
     var options = {
@@ -144,7 +170,7 @@ const getMeasurements = async (campaign) => {
   });
 }
 
-const getColumnsName = async (measurement, campaign) => {
+const getColumnsName = async (measurement, campaign, nameColumns) => {
   return new Promise((resolve, reject) => {
     var request = encodeURIComponent("SHOW TAG KEYS FROM \"" + measurement + "\"");
     var options = {
@@ -196,7 +222,7 @@ const getColumnsName = async (measurement, campaign) => {
   });
 }
 
-const getDataFromMeasurement = async (measurement, campaign) => {
+const getDataFromMeasurement = async (measurement, campaign, stream) => {
   return new Promise((resolve, reject) => {
     var request = encodeURIComponent("SELECT * FROM \"" + measurement + "\" LIMIT 5");
     var options = {
@@ -236,7 +262,6 @@ const getDataFromMeasurement = async (measurement, campaign) => {
       res.on('end', () => {
         try {
           const parsedData = JSON.parse(rawData);
-          //dataMeasurement.push(parsedData["results"][0]["series"][0]["name"]);
           (parsedData.results[0].series[0].values).forEach(async (data) => {
             var dataLine="";
             for (var i = 0; i < data.length; i++){
@@ -247,7 +272,9 @@ const getDataFromMeasurement = async (measurement, campaign) => {
                     dataLine = dataLine + data[i];
                 }
             }
-            stream.write(dataLine + "\n");
+            await stream.write(dataLine + "\n");
+            await stream.write("");
+
         });
         resolve();
         } catch (e) {

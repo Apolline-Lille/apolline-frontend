@@ -4,7 +4,6 @@
 
 var fs = require('fs');
 var http = require('http');
-var JSZip = require("jszip");
 var zlib = require('zlib');
 
 
@@ -64,7 +63,6 @@ const getDataFromMeasurement = async (url, stream) => {
         res.on('end', () => {
             try {
                 const parsedData = JSON.parse(rawData);
-                console.log("measurement: " + parsedData.results[0].series[0].name);
                 (parsedData.results[0].series[0].values).forEach(async (data) => {
                     var dataLine="";
                     for (var i = 0; i < data.length; i++){

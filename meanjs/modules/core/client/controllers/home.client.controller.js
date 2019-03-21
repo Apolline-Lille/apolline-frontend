@@ -3,7 +3,7 @@
 (function () {
   'use strict';
   var app = angular.module('core');
-    app.controller('HomeController', function($scope, $http){
+    app.controller('HomeController', function($scope, $http, $location){
       var listTags = "";
 
       var request = encodeURIComponent("SHOW DATABASES");
@@ -203,16 +203,24 @@
           var date = new Date().getTime();
           var nameFile = "data" + date.toString() + ".csv";
           console.log("Name file: " + nameFile);
-          $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', {params: {listURL: listRequest,tagString: listTags.replace(/ /g,""), fileName: nameFile }})
+          var config = {
+            params: {
+              listURL: listRequest,tagString: listTags.replace(/ /g,""), 
+              fileName: nameFile 
+            }
+          }
+          $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', config)
           .success(
-              function(success){
+              function(data){
                   console.log("well done!");
-                  console.log("success: " + success);
-			            var blob = new Blob([success], {type:"application/gzip"});			
+                  console.log("success: " + JSON.stringify(data));
+                  console.log(window.location.toString());
+                  
+                  /*var blob = new Blob([data], {type:"application/gzip"});	
                   var downloadLink = angular.element('<a></a>');
                   downloadLink.attr('href',window.URL.createObjectURL(blob));
-                  downloadLink.attr('download', "data.zip");
-                  downloadLink[0].click();
+                  downloadLink.attr('download', "data.gz");
+                  downloadLink[0].click();*/
               }
             )
             .error(

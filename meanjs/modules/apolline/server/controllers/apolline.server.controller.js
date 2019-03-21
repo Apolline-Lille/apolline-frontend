@@ -31,13 +31,23 @@ exports.getData = function getData(req, res, next){
   ApollineData.getData(listRequest, stringTags, nameFile)
     .then(function (response){
       //utils.writeCSV(res, response);
+      console.log(response);
       var filePath = path.join('/opt/mean.js/modules/apolline/client/CSVDownload/', response);
       var stat = fs.statSync(filePath);
-      res.set('Content-Type', 'text/csv');
+      res.set('Content-Type', 'application/gzip');
       res.set('Content-Length', stat.size);
       res.set('Content-Disposition', response);
-      var fileToSend = fs.readFileSync(filePath);
-      res.send(fileToSend);
+      var fileToSend = fs.readFile(filePath);
+      var file = fs.createReadStream(filePath);
+      file.on('open', function(){
+        file.pipe(res);
+      });
+      file.on('error', function(err){
+        res.end(err);
+      });
+      console.log("response: " + JSON.stringify(file));
+      console.log("filetosend: " + fileToSend)
+      res.send(JSON.stringify(file));
     })
     .catch(function (response){
       console.log(response);
