@@ -142,7 +142,8 @@
       }
 
       document.getElementById("generate").onclick = function(){
-        
+        document.getElementById('generate').style.display = "none";
+        document.getElementById('progress').style.display = "block";
         var campaign = localStorage.getItem("currentDB");
         var dataFilter = JSON.parse(localStorage.getItem("dataChoosen"));
         var dateBegin = "";
@@ -221,6 +222,8 @@
                   downloadLink.attr('href',window.URL.createObjectURL(blob));
                   downloadLink.attr('download', "data.gz");
                   downloadLink[0].click();*/
+                  document.getElementById('generate').style.display = "block";
+                  document.getElementById('progress').style.display = "none";
               }
             )
             .error(
