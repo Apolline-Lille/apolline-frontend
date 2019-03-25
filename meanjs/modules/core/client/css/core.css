@@ -41,27 +41,3 @@ a:hover .header-profile-image {
 .has-error .help-inline.error-text {
   display: inline;
 }
-
-
-/*for the loader circle
-#circle {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(40%,-30%);
-  width: auto;
-  height: auto;	
-}
-
-.loader {
-  width: calc(100% - 0px);
-  height: calc(100% - 0px);
-  border: 8px solid lightgray;
-  border-top: 8px solid #000000;
-  border-radius: 50%;
-  animation: rotate 5s linear infinite;
-}
-
-@keyframes rotate {
-  100% {transform: rotate(360deg);}
-} */
