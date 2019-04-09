@@ -4,6 +4,7 @@ var utils = require('../utils/write.js'),
   path = require('path'),
   fs = require('fs'),
   url = require('url'),
+  http = require('http'),
   ApollineCurl = require('../service/apolline-curl.server.service'),
   ApollineData = require('../service/apolline-getdata.server.service'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
@@ -37,17 +38,11 @@ exports.getData = function getData(req, res, next){
       res.set('Content-Type', 'application/gzip');
       res.set('Content-Length', stat.size);
       res.set('Content-Disposition', response);
-      var fileToSend = fs.readFile(filePath);
-      var file = fs.createReadStream(filePath);
-      file.on('open', function(){
-        file.pipe(res);
+      fs.chmodSync(filePath,'777', function (err) {
+        console.log("Cant change access to the file: " + err);
       });
-      file.on('error', function(err){
-        res.end(err);
-      });
-      console.log("response: " + JSON.stringify(file));
-      console.log("filetosend: " + fileToSend)
-      res.send(JSON.stringify(file));
+      console.log(res);
+      res.send(filePath);
     })
     .catch(function (response){
       console.log(response);

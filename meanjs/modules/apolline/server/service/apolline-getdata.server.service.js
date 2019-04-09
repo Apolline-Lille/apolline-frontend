@@ -84,7 +84,7 @@ const getDataFromMeasurement = async (url, stream) => {
             }
         });
     }).on('error', (e) => {
-        console.error(`Got error: ${e.message}`);
+        console.error(`Got error data: ${e.message}`);
     });
   });
 }
