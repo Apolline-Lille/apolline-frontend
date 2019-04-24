@@ -28,24 +28,15 @@ exports.getData = function getData(req, res, next){
   var stringTags = req.body.params.tagString;
   var nameFile = req.body.params.fileName;
   var query = url.parse(req.url, true).query;
+  console.log(query);
   console.log("nameFile " + nameFile);
   ApollineData.getData(listRequest, stringTags, nameFile)
     .then(function (response){
-      //utils.writeCSV(res, response);
-      console.log(response);
-      var filePath = path.join('/opt/mean.js/modules/apolline/client/CSVDownload/', response);
-      var stat = fs.statSync(filePath);
-      res.set('Content-Type', 'application/gzip');
-      res.set('Content-Length', stat.size);
-      res.set('Content-Disposition', response);
-      fs.chmodSync(filePath,'777', function (err) {
-        console.log("Cant change access to the file: " + err);
-      });
-      console.log(res);
-      res.send(filePath);
+      console.log("response: " + response);
+      utils.writeCSV(res,response);
     })
     .catch(function (response){
       console.log(response);
-      //utils.writeCSV(res, response);
+      utils.writeCSV(res, response);
     });
 };

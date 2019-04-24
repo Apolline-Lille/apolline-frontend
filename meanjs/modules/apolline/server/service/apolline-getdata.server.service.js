@@ -9,7 +9,7 @@ var zlib = require('zlib');
 
 
 exports.getData = async(listURL, tagsCSV, nameFile) => {
-    var path = "/opt/mean.js/modules/apolline/client/CSVDownload/";
+    var path = "/opt/mean.js/csvdownload/";
     var stream = fs.createWriteStream(path + nameFile);
     await stream.write(tagsCSV + "\n");
     return new Promise(async (resolve, reject) => {
@@ -37,7 +37,6 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
 const getDataFromMeasurement = async (url, stream) => {
     console.log("getDataFromMeasurement");
   return new Promise((resolve, reject) => {
-    console.log(url);
     http.get(url, (res) => {
         const { statusCode } = res;
         const contentType = res.headers['content-type'];
@@ -93,8 +92,4 @@ const asyncForEach = async (array, callback) =>{
     for (let index = 0; index < array.length; index++) {
         await callback(array[index], index, array);
     }
-}
-
-const compressFile = async (path, nameFile) => {
-    
 }

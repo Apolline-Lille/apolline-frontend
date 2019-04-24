@@ -1,9 +1,11 @@
 
 
+
+
 (function () {
   'use strict';
   var app = angular.module('core');
-    app.controller('HomeController', function($scope, $http, $location){
+    app.controller('HomeController', function($scope, $http){
       var listTags = "";
 
       var request = encodeURIComponent("SHOW DATABASES");
@@ -205,6 +207,7 @@
           var nameFile = "data" + date.toString() + ".csv";
           console.log("Name file: " + nameFile);
           var config = {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
             params: {
               listURL: listRequest,tagString: listTags.replace(/ /g,""), 
               fileName: nameFile 
@@ -213,31 +216,13 @@
           $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', config)
           .success(
               function(data){
-                  console.log("well done!");
-                  console.log("success: " + JSON.stringify(data));
-                  console.log(window.location.toString());
-                  $http.get(data, {
-                    responseType: "arraybuffer"
-                  }).then( function (response) {
-                      $scope.fileData = response.data;
-                      var headers = response.headers();
-                      headers['Content-Disposition'] = "attachement";
-                      var blob = new Blob([JSON.stringify(data)], {type: "application/gzip"});
-                      var link = document.createElement('a');
-                      ;
-                      console.log(urlFile);
-                      link.href = window.URL.createObjectURL(blob);
-                      // window.URL.createObjectURL(blob)
-                      link.download = "data.gz";
-                      document.body.appendChild(link);
-                      link.click();
-                      document.body.removeChild(link);
-                  });
-                  
-                  //streamer depuis server vers ordinateur user avec une requête HTTP.post et bon type MIME
-
-                  
-                  console.log('$location: '+ $location);
+                  var link = document.createElement('a');
+                  link.href = 'http://localhost:80/csv/'+data;
+                  link.target = '_blank';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                  //set the "Work in progress" element
                   document.getElementById('generate').style.display = "block";
                   document.getElementById('progress').style.display = "none";
               }
