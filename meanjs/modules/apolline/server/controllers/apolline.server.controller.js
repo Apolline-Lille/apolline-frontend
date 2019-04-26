@@ -28,11 +28,9 @@ exports.getData = function getData(req, res, next){
   var stringTags = req.body.params.tagString;
   var nameFile = req.body.params.fileName;
   var query = url.parse(req.url, true).query;
-  console.log(query);
-  console.log("nameFile " + nameFile);
   ApollineData.getData(listRequest, stringTags, nameFile)
-    .then(function (response){
-      console.log("response: " + response);
+    .then(async function (response){
+      await console.log("response: " + response);
       utils.writeCSV(res,response);
     })
     .catch(function (response){

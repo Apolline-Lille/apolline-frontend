@@ -5,9 +5,9 @@
 (function () {
   'use strict';
   var app = angular.module('core');
+
     app.controller('HomeController', function($scope, $http){
       var listTags = "";
-
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
           host: "apolline.lille.inria.fr",
@@ -207,32 +207,38 @@
           var nameFile = "data" + date.toString() + ".csv";
           console.log("Name file: " + nameFile);
           var config = {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded'},
+            headers: { 'Content-Type': 'application/gzip'},
             params: {
               listURL: listRequest,tagString: listTags.replace(/ /g,""), 
               fileName: nameFile 
             }
           }
-          $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', config)
-          .success(
-              function(data){
-                  var link = document.createElement('a');
-                  link.href = 'http://localhost:80/csv/'+data;
-                  link.target = '_blank';
-                  document.body.appendChild(link);
-                  link.click();
-                  document.body.removeChild(link);
-                  //set the "Work in progress" element
-                  document.getElementById('generate').style.display = "block";
-                  document.getElementById('progress').style.display = "none";
-              }
-            )
-            .error(
-              function(error){
-                console.log(error);
-              }
-            );
+
+          $scope.createFile = function(){
+            return $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', config);
+          };
+          
+          Promise.all([$scope.createFile()]).then(result => {
+            return result[0].data;
+          }).then(data => {
+            console.log("Creation of the file OK");
+            console.log("nom du fichier: " + data.finalName);
+
+            var link = document.createElement('a');
+            link.href = 'http://localhost:80/csv/'+data.finalName;
+            link.download = data.finalName;     
+            document.body.appendChild(link);       
+            link.click();
+            document.body.removeChild(link);
+
+            //set the "Work in progress" element
+            document.getElementById('generate').style.display = "block";
+            document.getElementById('progress').style.display = "none";
+          }).catch(err => {
+            console.error(err);
+          });
         }    
       }
     });
 }());
+

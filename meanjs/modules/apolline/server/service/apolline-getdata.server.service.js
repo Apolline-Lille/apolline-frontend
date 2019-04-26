@@ -9,6 +9,10 @@ var zlib = require('zlib');
 
 
 exports.getData = async(listURL, tagsCSV, nameFile) => {
+    var finalResponse = {
+        created : false,
+        finalName: ""
+    };
     var path = "/opt/mean.js/csvdownload/";
     var stream = fs.createWriteStream(path + nameFile);
     await stream.write(tagsCSV + "\n");
@@ -27,11 +31,14 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
         console.log("ici");
         await fileContents.pipe(zip).pipe(writeStream).on('finish', (err) => {
             if (err) return reject(err);
-            else resolve();
+            else {
+                finalResponse.created = true;
+                finalResponse.finalName = nameFile + ".gz";
+                return resolve(finalResponse);
+            }
         });
         await fs.unlinkSync(path + nameFile);
-        var finalName = nameFile + '.gz';
-        return resolve(finalName);     
+        //return resolve(finalResponse);     
     });
 }
 const getDataFromMeasurement = async (url, stream) => {
