@@ -20,6 +20,9 @@ exports.invokeRolesPolicies = function () {
     },{
       resources: '/measurements/:campaign/data',
       permissions: '*'
+    },{
+      resources: '/delete',
+      permissions: '*'
     }]
   }, {
     roles: ['user'],
@@ -29,6 +32,9 @@ exports.invokeRolesPolicies = function () {
     },{
       resources: '/measurements/:campaign/data',
       permissions: '*'
+    },{
+      resources: '/delete',
+      permissions: '*'
     }]
   }, {
     roles: ['guest'],
@@ -37,6 +43,9 @@ exports.invokeRolesPolicies = function () {
       permissions: '*'
     },{
       resources: '/measurements/:campaign/data',
+      permissions: '*'
+    },{
+      resources: '/delete',
       permissions: '*'
     }]
   }]);

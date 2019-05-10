@@ -5,8 +5,7 @@
 (function () {
   'use strict';
   var app = angular.module('core');
-
-    app.controller('HomeController', function($scope, $http){
+    app.controller('HomeController', ['$scope', '$http', 'WorkerService', function($scope, $http, WorkerService){
       var listTags = "";
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
@@ -116,7 +115,6 @@
         }
       }
 
-
       document.getElementById("onClickTags").onclick = function(){
         //Allowed the user to click on the next button to choose date
         document.getElementById("forDate").disabled = false;
@@ -169,7 +167,7 @@
             }
           }
           listTags = tagString;
-          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 100000";
+          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 50000";
           var requestEncode = encodeURIComponent(request);
           msrURL = urlFinal + requestEncode;
           if (!(document.getElementById("allData").checked)){
@@ -209,36 +207,73 @@
           var config = {
             headers: { 'Content-Type': 'application/gzip'},
             params: {
-              listURL: listRequest,tagString: listTags.replace(/ /g,""), 
-              fileName: nameFile 
+              listURL: listRequest,
+              tagString: listTags.replace(/ /g,""), 
+              fileName: nameFile
             }
+          };
+          var dbChoose = localStorage.getItem("currentDB");
+
+          var inputToWorker = {
+            dataUrl: 'http://0.0.0.0:80/measurements/' + dbChoose + '/data',
+            pollingInterval: 5,
+            conf: config
           }
 
-          $scope.createFile = function(){
-            return $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data', config);
+          WorkerService.startWork(inputToWorker).then(function (response){
+            console.log(response);
+          }, function(error){
+            console.log(error);
+          }, function(response){
+            console.log("Notification worker RESPONSE: " + response);
+            document.getElementById('progress').style.display = "none";
+            var finalName = nameFile + '.gz';
+            var link = document.getElementById('linktoDL');
+            link.style.display = "block";
+            link.href = 'http://localhost:80/csv/' + finalName;
+            link.download = finalName;
+            WorkerService.stopWork();     
+          });
+          /*function createFile(){
+            return $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data',config);
           };
-          
+
+          //utiliser un worker pour avoir réponse immédiate du server et envoyer un lien une fois le fichier créé
+
           Promise.all([$scope.createFile()]).then(result => {
             return result[0].data;
           }).then(data => {
-            console.log("Creation of the file OK");
-            console.log("nom du fichier: " + data.finalName);
+            if (data.created){
+              console.log("Creation of the file OK");
+              console.log("nom du fichier: " + data.finalName);
 
-            var link = document.createElement('a');
-            link.href = 'http://localhost:80/csv/'+data.finalName;
-            link.download = data.finalName;     
-            document.body.appendChild(link);       
-            link.click();
-            document.body.removeChild(link);
+              var link = document.createElement('a');
+              link.href = 'http://localhost:80/csv/'+data.finalName;
+              link.download = data.finalName;     
+              document.body.appendChild(link);       
+              link.click();
+              document.body.removeChild(link);
 
-            //set the "Work in progress" element
-            document.getElementById('generate').style.display = "block";
-            document.getElementById('progress').style.display = "none";
+              //set the "Work in progress" element
+              document.getElementById('generate').style.display = "block";
+              document.getElementById('progress').style.display = "none";
+              return data.finalName;
+            }
+          }).then((name) => {
+            var config = {
+              params: {
+                file: name
+              }
+            };
           }).catch(err => {
             console.error(err);
-          });
+          });*/
         }    
       }
-    });
-}());
 
+      document.getElementById("linktoDL").onclick = function(){
+        document.getElementById('linktoDL').style.display = "none";
+        document.getElementById('generate').style.display = "block";
+      }
+    }]);
+}());

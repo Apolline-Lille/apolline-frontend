@@ -37,6 +37,7 @@
         <div class="row">
           <form>
             <div class="form-group">
+                <h3>Choose the Measurements</h3>
               <li ng-repeat="measurement in checkboxMeasurement" style="width:50%; float:left;">
                   <input type="checkbox" class="measurementValue" value="{{measurement}}"> {{measurement}}
               </li>
@@ -87,6 +88,7 @@
             <input type="date" id="endDate">
             <br>
             <br>
+            <a id="linktoDL" class="btn btn-success btn-lg" style="display:none">Download</a>
             <button type="submit" id="generate" class="btn btn-success btn-lg" style="float:right">
               Generate CSV
             </button>

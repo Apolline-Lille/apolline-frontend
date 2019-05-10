@@ -4,12 +4,14 @@ var utils = require('../utils/write.js'),
   path = require('path'),
   fs = require('fs'),
   url = require('url'),
-  http = require('http'),
+  util = require('util'),
   ApollineCurl = require('../service/apolline-curl.server.service'),
   ApollineData = require('../service/apolline-getdata.server.service'),
+  ApollineDelete = require('../service/apolline-delete.server.service'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'utf8');
+
 
 exports.measurementsCampaignGET = function measurementsCampaignGET (req, res, next) {
   var campaign = req.params.campaign;
@@ -29,12 +31,26 @@ exports.getData = function getData(req, res, next){
   var nameFile = req.body.params.fileName;
   var query = url.parse(req.url, true).query;
   ApollineData.getData(listRequest, stringTags, nameFile)
-    .then(async function (response){
-      await console.log("response: " + response);
-      utils.writeCSV(res,response);
-    })
-    .catch(function (response){
-      console.log(response);
-      utils.writeCSV(res, response);
-    });
+  .then(async function (response){
+    await console.log("response getData: " + response);
+    utils.writeCSV(res,response);
+  })
+  .catch(function (response){
+    console.log(response);
+    utils.writeCSV(res, response);
+  });
 };
+
+//req.body: {"{\"headers\":{\"Content-Type\":\"application/gzip\"},\"params\":{\"listURL\":[\"http://apolline.lille.inria.fr:8086/query?db":"loa","q":"SELECT time, device, geohash, provider, transport, unit, uuid, value FROM \"temperature.k\" LIMIT 50000\"],\"tagString\":\"device,geohash,provider,transport,unit,uuid\",\"fileName\":\"data1557391318429.csv\"}}"}
+
+
+exports.removeFile = function removeFile(req, res, next){
+  //var fileToRemove = req.body.params.file;
+  console.log("fileToRemove " + req.body.params.file);
+  ApollineDelete.removeFile(fileToRemove)
+    .then(function (response){
+      console.log("file deleted: " + response);
+    }).catch (function (response){
+      console.error(response);
+    })
+}
