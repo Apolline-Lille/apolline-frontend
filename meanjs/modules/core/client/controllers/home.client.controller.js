@@ -226,54 +226,15 @@
             console.log(error);
           }, function(response){
             console.log("Notification worker RESPONSE: " + response);
-            document.getElementById('progress').style.display = "none";
             var finalName = nameFile + '.gz';
-            var link = document.getElementById('linktoDL');
-            link.style.display = "block";
-            link.href = 'http://localhost:80/csv/' + finalName;
-            link.download = finalName;
-            WorkerService.stopWork();     
+            document.getElementById('progress').style.display = "none";
+            document.getElementById('link').style.display = "block";
+            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
+            document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
+            document.getElementById('generate').style.display = "block";    
+            WorkerService.stopWork();
           });
-          /*function createFile(){
-            return $http.post('/measurements/' + localStorage.getItem('currentDB') + '/data',config);
-          };
-
-          //utiliser un worker pour avoir réponse immédiate du server et envoyer un lien une fois le fichier créé
-
-          Promise.all([$scope.createFile()]).then(result => {
-            return result[0].data;
-          }).then(data => {
-            if (data.created){
-              console.log("Creation of the file OK");
-              console.log("nom du fichier: " + data.finalName);
-
-              var link = document.createElement('a');
-              link.href = 'http://localhost:80/csv/'+data.finalName;
-              link.download = data.finalName;     
-              document.body.appendChild(link);       
-              link.click();
-              document.body.removeChild(link);
-
-              //set the "Work in progress" element
-              document.getElementById('generate').style.display = "block";
-              document.getElementById('progress').style.display = "none";
-              return data.finalName;
-            }
-          }).then((name) => {
-            var config = {
-              params: {
-                file: name
-              }
-            };
-          }).catch(err => {
-            console.error(err);
-          });*/
         }    
-      }
-
-      document.getElementById("linktoDL").onclick = function(){
-        document.getElementById('linktoDL').style.display = "none";
-        document.getElementById('generate').style.display = "block";
       }
     }]);
 }());
