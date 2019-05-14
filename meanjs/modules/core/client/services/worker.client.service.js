@@ -9,7 +9,6 @@ angular.module('core')
         console.log("inputToWorker: " + inputToWorker);
         var defer = $q.defer();
         if (worker){
-          console.log("------------------- termination worker----------------------");
           worker.terminate();
         }
 
@@ -29,7 +28,7 @@ angular.module('core')
 
               console.log('Notifications - Data URL: ' + dataUrl);
               //get Notification count
-              var delay = 2000; // poller 5sec delay
+              var delay = 5000; // poller 5sec delay
               (function pollerFunc() {
                   timeoutPromise = setTimeout(function() {
                       var params = config;
@@ -62,12 +61,14 @@ angular.module('core')
             defer.notify(e.data);
         };
         worker.postMessage(inputToWorker); // Send data to our worker.
+        console.log("After postMessage");
         return defer.promise;
       },
 
       stopWork: function() {
         if (worker) {
-            worker.terminate();
+          console.log("------------------- termination worker----------------------");
+          worker.terminate();
         }
       }
 
