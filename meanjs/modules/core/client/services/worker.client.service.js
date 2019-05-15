@@ -3,7 +3,7 @@
 angular.module('core')
   .factory('WorkerService', function ($q) {
  
-    var worker = undefined;
+    /*var worker = undefined;
     return{
       startWork: function(inputToWorker){
         console.log("inputToWorker: " + inputToWorker);
@@ -11,11 +11,25 @@ angular.module('core')
         if (worker){
           console.log("avant le terminate");
           worker.terminate();
-        }
+        }*/
 
         //function to be your worker
         function workerFunction(){
-          var self = this;
+          function process(myData) {
+            var dataUrl = myData.dataUrl;
+            var config = myData.conf;
+            console.log("dataURL: " + myData.dataUrl);
+            console.log("config: " + myData.config);
+            var params = config;
+            var xmlhttp = new XMLHttpRequest();
+            xmlhttp.open('POST', dataUrl, true);
+            xmlhttp.setRequestHeader("Content-type", "application/json");
+            xmlhttp.send(JSON.stringify(params));
+          }
+          self.addEventListener('message', function(e) {
+            self.postMessage(process(e.data.myData));
+          }, false);
+          /*var self = this;
 
           self.onmessage = function(event) {
             var timeoutPromise = undefined;
@@ -47,7 +61,7 @@ angular.module('core')
                   }, delay);
               })();
             }
-          }
+          }*/
         }
         var dataObj = '(' + workerFunction + ')();'; // here is the trick to convert the above fucntion to string
         var blob = new Blob([dataObj.replace('"use strict";', '')]); // firefox adds user strict to any function which was blocking might block worker execution so knock it off
@@ -56,15 +70,30 @@ angular.module('core')
             type: 'application/javascript; charset=utf-8'
         });
 
-        worker = new Worker(blobURL);
-        worker.onmessage = function(e) {
+        var worker = new Worker(blobURL);
+        /*worker.onmessage = function(e) {
             console.log('Worker said: ', e.data);
             worker.terminate();
             defer.notify(e.data);
         };
         worker.postMessage(inputToWorker); // Send data to our worker.
-        return defer.promise;
-      },
+        return defer.promise;*/
+        var defer;
+        worker.addEventListener('message', function(e) {
+          // traitements additionnels ...
+          defer.resolve(e.data);
+        }, false);
+    
+        return {
+            processData : async function(data){
+                defer = $q.defer();
+                worker.postMessage({
+                  'myData': data
+                });
+                return defer.promise;
+            }
+        };
+  /*},
 
       stopWork: function() {
         if (worker){
@@ -73,5 +102,5 @@ angular.module('core')
         }
       }
 
-    }
+    }*/
   });

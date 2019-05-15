@@ -185,7 +185,7 @@
             }
           }
           listTags = tagString;
-          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 200000";
+          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 300000";
           var requestEncode = encodeURIComponent(request);
           msrURL = urlFinal + requestEncode;
           //Check whate filter on date the user have choosen
@@ -237,12 +237,27 @@
 
           var inputToWorker = {
             dataUrl: 'http://0.0.0.0:80/measurements/' + dbChoose + '/data',
-            pollingInterval: 5,
+            //pollingInterval: 5,
             conf: config
           }
 
+          WorkerService.processData(inputToWorker).then(function(result){
+            //result of the worker
+            console.log("Notification worker RESPONSE: " + result);
+            //Name of the file
+            var finalName = nameFile + '.gz';
+            //Hide the Work in progress element
+            document.getElementById('progress').style.display = "none";
+            //Show the link to the created file 
+            document.getElementById('link').style.display = "block";
+            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
+            document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
+            //Show the Generation button
+            document.getElementById('generate').style.display = "block";
+          });
+
           //Beginning of the worker ../service/worker.client.service.js
-          WorkerService.startWork(inputToWorker).then(function (response){
+          /*WorkerService.startWork(inputToWorker).then(function (response){
             console.log("End of the worker: " + response);
             WorkerService.stopWork();
           }, function(error){
@@ -262,7 +277,7 @@
             document.getElementById('generate').style.display = "block";
             //Stop the worker
             WorkerService.stopWork();
-          });
+          });*/
 
           /*console.log("test fichier: " + test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz"));
           if (test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz")){
