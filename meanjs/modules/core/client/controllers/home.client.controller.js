@@ -16,6 +16,7 @@
       //URL to get the databases from apolline
       var urlDatabase = "http://" + options.host + ":" + options.port + options.path;
 
+
       //The HTTP request to get the databases
       $http.get(urlDatabase).then(function successCallback(response){
         var listDataBases = response.data.results[0].series[0].values;
@@ -219,6 +220,7 @@
           alert("Filter by choosing 2 date or by checking the first option");
         }
         else {
+          
           var date = new Date().getTime();
           var nameFile = "data" + date.toString() + ".csv";
           console.log("Name file: " + nameFile);
@@ -241,23 +243,9 @@
 
           //Beginning of the worker ../service/worker.client.service.js
           WorkerService.startWork(inputToWorker).then(function (response){
-            //result of the worker
-            console.log("Notification worker RESPONSE: " + response);
-            //Name of the file
-            var finalName = nameFile + '.gz';
-            //Hide the Work in progress element
-            document.getElementById('progress').style.display = "none";
-            //Show the link to the created file 
-            document.getElementById('link').style.display = "block";
-            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
-            document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
-            //Show the Generation button
-            document.getElementById('generate').style.display = "block";
-            //Stop the worker
+            console.log("End of the worker: " + response);
             WorkerService.stopWork();
-          }).catch(function(err){
-            console.log("ERROR: " + err);
-          });/*, function(error){
+          }, function(error){
             console.log("ERROR: " + error);
           }, function(response){
             //result of the worker
@@ -274,8 +262,9 @@
             document.getElementById('generate').style.display = "block";
             //Stop the worker
             WorkerService.stopWork();
-          });*/
+          });
 
+          /*console.log("test fichier: " + test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz"));
           if (test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz")){
             //Name of the file
             var finalName = nameFile + '.gz';
@@ -289,9 +278,10 @@
             document.getElementById('generate').style.display = "block";
             //Stop the worker
             WorkerService.stopWork();
-          }
-        }    
+          }*/
+        }       
       }
+      
 
       function test_fichier(url){
         var xhr_object = new XMLHttpRequest();

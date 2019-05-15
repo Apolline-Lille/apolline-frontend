@@ -9,6 +9,7 @@ angular.module('core')
         console.log("inputToWorker: " + inputToWorker);
         var defer = $q.defer();
         if (worker){
+          console.log("avant le terminate");
           worker.terminate();
         }
 
@@ -58,16 +59,16 @@ angular.module('core')
         worker = new Worker(blobURL);
         worker.onmessage = function(e) {
             console.log('Worker said: ', e.data);
+            worker.terminate();
             defer.notify(e.data);
         };
         worker.postMessage(inputToWorker); // Send data to our worker.
-        console.log("After postMessage");
         return defer.promise;
       },
 
       stopWork: function() {
-        if (worker) {
-          console.log("------------------- termination worker----------------------");
+        if (worker){
+          console.log("------------------- worker finished ----------------------");
           worker.terminate();
         }
       }

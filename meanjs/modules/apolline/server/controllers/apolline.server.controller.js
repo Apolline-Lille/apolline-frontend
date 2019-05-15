@@ -41,8 +41,6 @@ exports.getData = function getData(req, res, next){
   });
 };
 
-//req.body: {"{\"headers\":{\"Content-Type\":\"application/gzip\"},\"params\":{\"listURL\":[\"http://apolline.lille.inria.fr:8086/query?db":"loa","q":"SELECT time, device, geohash, provider, transport, unit, uuid, value FROM \"temperature.k\" LIMIT 50000\"],\"tagString\":\"device,geohash,provider,transport,unit,uuid\",\"fileName\":\"data1557391318429.csv\"}}"}
-
 
 exports.removeFile = function removeFile(req, res, next){
   //var fileToRemove = req.body.params.file;
