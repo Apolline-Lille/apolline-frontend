@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var app = angular.module('core');
-    app.controller('HomeController', ['$scope', '$http', 'WorkerService', function($scope, $http, WorkerService){
+    app.controller('HomeController', ['$scope', '$http', '$q', 'WorkerService', function($scope, $http, $q, WorkerService){
       var listTags = "";
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
@@ -185,7 +185,7 @@
             }
           }
           listTags = tagString;
-          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 300000";
+          var request = "SELECT time, " + tagString + ", value FROM \"" + elt.measurement + "\" LIMIT 200000";
           var requestEncode = encodeURIComponent(request);
           msrURL = urlFinal + requestEncode;
           //Check whate filter on date the user have choosen

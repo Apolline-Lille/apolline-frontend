@@ -78,19 +78,20 @@ angular.module('core')
         };
         worker.postMessage(inputToWorker); // Send data to our worker.
         return defer.promise;*/
+
         var defer;
-        worker.addEventListener('message', function(e) {
-          // traitements additionnels ...
-          defer.resolve(e.data);
+        worker.addEventListener('message', async function(e) {
+          console.log('Worker said: ', e.data);
+          await defer.resolve(e.data);
         }, false);
-    
+
         return {
             processData : async function(data){
-                defer = $q.defer();
-                worker.postMessage({
-                  'myData': data
-                });
-                return defer.promise;
+              defer = $q.defer();
+              worker.postMessage({
+                'myData': data
+              });
+              return await defer.promise;
             }
         };
   /*},
