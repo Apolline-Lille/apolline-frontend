@@ -5,7 +5,7 @@
 (function () {
   'use strict';
   var app = angular.module('core');
-    app.controller('HomeController', ['$scope', '$http', '$q', 'WorkerService', function($scope, $http, $q, WorkerService){
+    app.controller('HomeController', ['$scope', '$http', 'WorkerService', function($scope, $http, WorkerService){
       var listTags = "";
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
@@ -237,80 +237,93 @@
 
           var inputToWorker = {
             dataUrl: 'http://0.0.0.0:80/measurements/' + dbChoose + '/data',
-            //pollingInterval: 5,
             conf: config
           }
 
           WorkerService.processData(inputToWorker).then(function(result){
             //result of the worker
-            console.log("Notification worker RESPONSE: " + result);
+            //console.log("Notification worker RESPONSE: " + result);
             //Name of the file
             var finalName = nameFile + '.gz';
+            localStorage.setItem('finalFile', finalName);
+
             //Hide the Work in progress element
             document.getElementById('progress').style.display = "none";
             //Show the link to the created file 
             document.getElementById('link').style.display = "block";
-            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
             document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
             //Show the Generation button
-            document.getElementById('generate').style.display = "block";
+            document.getElementById('generate').style.display = "block";    
           });
-
-          //Beginning of the worker ../service/worker.client.service.js
-          /*WorkerService.startWork(inputToWorker).then(function (response){
-            console.log("End of the worker: " + response);
-            WorkerService.stopWork();
-          }, function(error){
-            console.log("ERROR: " + error);
-          }, function(response){
-            //result of the worker
-            console.log("Notification worker RESPONSE: " + response);
-            //Name of the file
-            var finalName = nameFile + '.gz';
-            //Hide the Work in progress element
-            document.getElementById('progress').style.display = "none";
-            //Show the link to the created file 
-            document.getElementById('link').style.display = "block";
-            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
-            document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
-            //Show the Generation button
-            document.getElementById('generate').style.display = "block";
-            //Stop the worker
-            WorkerService.stopWork();
-          });*/
-
-          /*console.log("test fichier: " + test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz"));
-          if (test_fichier("/opt/mean.js/csvdownload/" + nameFile + ".gz")){
-            //Name of the file
-            var finalName = nameFile + '.gz';
-            //Hide the Work in progress element
-            document.getElementById('progress').style.display = "none";
-            //Show the link to the created file 
-            document.getElementById('link').style.display = "block";
-            document.getElementById('link').href = 'http://localhost:80/csv/' + finalName;
-            document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
-            //Show the Generation button
-            document.getElementById('generate').style.display = "block";
-            //Stop the worker
-            WorkerService.stopWork();
-          }*/
         }       
       }
-      
 
-      function test_fichier(url){
-        var xhr_object = new XMLHttpRequest();
-        xhr_object.open("HEAD", url, false);
-        xhr_object.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-        xhr_object.send();
-        console.log("verification request send");
-        if(xhr_object.readyState == 4)	{
-          if(xhr_object.responseText == 1)
-            return(true);
-          else
-            return(false);
-        }
-        else return(false);
+      document.getElementById('link').onclick = function(){
+        var isDownload = false;
+        var file = localStorage.getItem('finalFile');
+        $http({
+          url: '/exist',
+          method: 'GET',
+          params: {file: file}
+        }).then(function(result){
+          console.log(result.data);
+          if (result.data){
+            var iframe = document.getElementById('my_iframe');
+            iframe.src = 'http://localhost:80/csv/' + file;
+            //essayer de lancer la suppression quand le fichier est téléchargé
+            isDownload = true;
+          }
+          else {
+            alert('file not created yet');
+          }
+        }).then(() => {
+          /*if(isDownload){
+            $http({
+              url: '/delete',
+              method: 'GET',
+              params: {file: file}
+            }).catch((err)=>{
+              console.log(err);
+            });
+          }*/
+        }).catch(function(err){
+          console.log(err);
+        });
+        /*doesFileExist('http://0.0.0.0:80/csv/' + file, function(res){
+          console.log("result on click: " + res);
+          if (res == false){
+            alert('File not created yet');
+          }
+          else{
+            console.log("error");
+            document.getElementById('link').href = 'http://localhost:80/csv/' + file;
+            document.getElementById('link').click();
+          }
+        });*/
+        
       }
     }]);
+
+    function doesFileExist(fileUrl, callback) {
+      var res = false;
+      fetch(fileUrl, {
+          method: 'GET',
+          mode: 'no-cors'
+      })
+      .then(function(response) {
+        console.log(response.status);
+        if (response.status == 200) {
+            console.log("file exists!");
+            res = true;
+            return callback(res);
+        } else {
+            console.log("file doesn't exist!");
+            return callback(res);
+        }
+      })
+      .catch(function(error) {
+        console.log("Error ", error);
+      });
+    }
+
 }());

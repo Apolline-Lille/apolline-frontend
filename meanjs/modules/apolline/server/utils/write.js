@@ -36,13 +36,13 @@ var writeCSV = exports.writeCSV = async function(response, arg1, arg2) {
     // if no response code given, we default to 200
     code = 200;
   }
-  if(typeof value === 'object') {
+  /*if(typeof value === 'object') {
     var data = JSON.stringify(value);
     console.log('data = '+data);
   }
   else{
     var data = value.toString();
-  }
+  }*/
   response.writeHead(code, {'Content-Type': 'application/gzip'});
-  response.end(data);
+  response.end(JSON.stringify(value));
 }

@@ -21,6 +21,9 @@ exports.invokeRolesPolicies = function () {
       resources: '/measurements/:campaign/data',
       permissions: '*'
     },{
+      resources: '/exist',
+      permissions: '*'
+    },{
       resources: '/delete',
       permissions: '*'
     }]
@@ -33,6 +36,9 @@ exports.invokeRolesPolicies = function () {
       resources: '/measurements/:campaign/data',
       permissions: '*'
     },{
+      resources: '/exist',
+      permissions: '*'
+    },{
       resources: '/delete',
       permissions: '*'
     }]
@@ -43,6 +49,9 @@ exports.invokeRolesPolicies = function () {
       permissions: '*'
     },{
       resources: '/measurements/:campaign/data',
+      permissions: '*'
+    },{
+      resources: '/exist',
       permissions: '*'
     },{
       resources: '/delete',

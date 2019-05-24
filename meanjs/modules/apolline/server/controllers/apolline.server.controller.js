@@ -8,6 +8,7 @@ var utils = require('../utils/write.js'),
   ApollineCurl = require('../service/apolline-curl.server.service'),
   ApollineData = require('../service/apolline-getdata.server.service'),
   ApollineDelete = require('../service/apolline-delete.server.service'),
+  ApollineExist = require('../service/apolline-exist.server.service'),
   errorHandler = require(path.resolve('./modules/core/server/controllers/errors.server.controller'));
 
 var spec = fs.readFileSync(path.join(__dirname,'../config/api/swagger.yaml'), 'utf8');
@@ -32,8 +33,9 @@ exports.getData = function getData(req, res, next){
   var query = url.parse(req.url, true).query;
   ApollineData.getData(listRequest, stringTags, nameFile)
   .then(async function (response){
-    await console.log("response getData: " + response);
-    utils.writeCSV(res,response);
+    console.log("response getData: " + response);
+    res.send(response);
+    //utils.writeCSV(res,response);
   })
   .catch(function (response){
     console.log(response);
@@ -41,10 +43,21 @@ exports.getData = function getData(req, res, next){
   });
 };
 
+exports.exist = function exist(req,res,next){
+  var fileName = req.query.file;
+  ApollineExist.exist(fileName).then(function (response) {
+    console.log("response exist: " + response);
+    res.send(response);
+  }).catch(function (response){
+    console.log(response);
+    utils.writeCSV(res, response);
+  });
+}
+
 
 exports.removeFile = function removeFile(req, res, next){
-  //var fileToRemove = req.body.params.file;
-  console.log("fileToRemove " + req.body.params.file);
+  var fileToRemove = req.query.file;
+  console.log("fileToRemove " + fileToRemove);
   ApollineDelete.removeFile(fileToRemove)
     .then(function (response){
       console.log("file deleted: " + response);

@@ -34,17 +34,19 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
             else {
                 finalResponse.created = true;
                 finalResponse.finalName = nameFile + ".gz";
+                fileContents.close();
+                writeStream.end();
+                console.log("finish request");
                 return resolve(finalResponse);
             }
         });
-        await fs.unlinkSync(path + nameFile);
-        //return resolve(finalResponse);     
+        await fs.unlinkSync(path + nameFile);   
     });
 }
 const getDataFromMeasurement = async (url, stream) => {
     console.log("getDataFromMeasurement");
   return new Promise((resolve, reject) => {
-    http.get(url, (res) => {
+    var request = http.get(url, (res) => {
         const { statusCode } = res;
         const contentType = res.headers['content-type'];
         let error;
@@ -84,6 +86,7 @@ const getDataFromMeasurement = async (url, stream) => {
                 });
                 console.log("before the end");
                 resolve(stream.write(""));
+                request.end();
             } catch (e) {
                 console.log("erreur resolve");
                 console.error(e.message);
