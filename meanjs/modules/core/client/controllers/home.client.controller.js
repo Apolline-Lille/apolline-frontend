@@ -7,6 +7,7 @@
   var app = angular.module('core');
     app.controller('HomeController', ['$scope', '$http', 'WorkerService', function($scope, $http, WorkerService){
       var listTags = "";
+      var i = 0;
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
           host: "apolline.lille.inria.fr",
@@ -253,77 +254,61 @@
             document.getElementById('link').style.display = "block";
             document.getElementById('link').textContent = 'http://localhost:80/csv/' + finalName;
             //Show the Generation button
-            document.getElementById('generate').style.display = "block";    
+            document.getElementById('generate').style.display = "block";
+            i = 0;
           });
         }       
       }
-
+      var count = 0;
       document.getElementById('link').onclick = function(){
         var isDownload = false;
+        var canDelete = false;
+        
         var file = localStorage.getItem('finalFile');
         $http({
           url: '/exist',
           method: 'GET',
           params: {file: file}
         }).then(function(result){
-          console.log(result.data);
-          if (result.data){
-            var iframe = document.getElementById('my_iframe');
-            iframe.src = 'http://localhost:80/csv/' + file;
-            //essayer de lancer la suppression quand le fichier est téléchargé
-            isDownload = true;
+          console.log("file exist: " + result.data);
+          if ((result.data) && (i==0)){
+            //var iframe = document.getElementById('my_iframe');
+            //iframe.src = 'http://localhost:80/csv/' + file;
+            var link = document.getElementById('link');
+            link.target = "_self";
+            link.href = 'http://localhost:80/csv/' + file;
+            link.download = file;
+            i = 1;
+            link.click();
           }
-          else {
+          else if (i==0){
             alert('file not created yet');
           }
         }).then(() => {
-          /*if(isDownload){
+          if ((i==1) && (count==0)) {
+            console.log("count: " + count);
+            var name = localStorage.getItem('finalFile')
+            console.log("isDownloaded: " + name);
+            count ++;
             $http({
               url: '/delete',
               method: 'GET',
-              params: {file: file}
-            }).catch((err)=>{
+              params: {file: name}
+            }).catch((err) => {
               console.log(err);
             });
-          }*/
-        }).catch(function(err){
+          }
+        }).catch((err) => {
           console.log(err);
         });
-        /*doesFileExist('http://0.0.0.0:80/csv/' + file, function(res){
-          console.log("result on click: " + res);
-          if (res == false){
-            alert('File not created yet');
-          }
-          else{
-            console.log("error");
-            document.getElementById('link').href = 'http://localhost:80/csv/' + file;
-            document.getElementById('link').click();
-          }
-        });*/
-        
       }
     }]);
 
-    function doesFileExist(fileUrl, callback) {
-      var res = false;
-      fetch(fileUrl, {
-          method: 'GET',
-          mode: 'no-cors'
-      })
-      .then(function(response) {
-        console.log(response.status);
-        if (response.status == 200) {
-            console.log("file exists!");
-            res = true;
-            return callback(res);
-        } else {
-            console.log("file doesn't exist!");
-            return callback(res);
-        }
-      })
-      .catch(function(error) {
-        console.log("Error ", error);
-      });
+    function downloadComplete(){
+      var file = localStorage.getItem('finalFile');
+      var iframe = document.getElementById('my_iframe');
+      iframe.src = 'http://localhost:80/csv/' + file;
+      return true;
     }
 
 }());
