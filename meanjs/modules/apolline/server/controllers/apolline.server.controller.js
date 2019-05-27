@@ -63,5 +63,5 @@ exports.removeFile = function removeFile(req, res, next){
       console.log("file deleted: " + response);
     }).catch (function (response){
       console.error(response);
-    })
+  });
 }

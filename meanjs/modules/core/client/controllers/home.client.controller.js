@@ -8,6 +8,7 @@
     app.controller('HomeController', ['$scope', '$http', 'WorkerService', function($scope, $http, WorkerService){
       var listTags = "";
       var i = 0;
+      var count = 0;
       var request = encodeURIComponent("SHOW DATABASES");
       var options = {
           host: "apolline.lille.inria.fr",
@@ -242,8 +243,6 @@
           }
 
           WorkerService.processData(inputToWorker).then(function(result){
-            //result of the worker
-            //console.log("Notification worker RESPONSE: " + result);
             //Name of the file
             var finalName = nameFile + '.gz';
             localStorage.setItem('finalFile', finalName);
@@ -256,59 +255,64 @@
             //Show the Generation button
             document.getElementById('generate').style.display = "block";
             i = 0;
+            count = 0;
           });
         }       
       }
-      var count = 0;
+      
       document.getElementById('link').onclick = function(){
-        var isDownload = false;
-        var canDelete = false;
-        
+        var exist = true;
         var file = localStorage.getItem('finalFile');
-        $http({
-          url: '/exist',
-          method: 'GET',
-          params: {file: file}
-        }).then(function(result){
-          console.log("file exist: " + result.data);
-          if ((result.data) && (i==0)){
-            //var iframe = document.getElementById('my_iframe');
-            //iframe.src = 'http://localhost:80/csv/' + file;
-            var link = document.getElementById('link');
-            link.target = "_self";
-            link.href = 'http://localhost:80/csv/' + file;
-            link.download = file;
-            i = 1;
-            link.click();
-          }
-          else if (i==0){
-            alert('file not created yet');
-          }
-        }).then(() => {
-          if ((i==1) && (count==0)) {
-            console.log("count: " + count);
-            var name = localStorage.getItem('finalFile')
-            console.log("isDownloaded: " + name);
-            count ++;
-            $http({
-              url: '/delete',
-              method: 'GET',
-              params: {file: name}
-            }).catch((err) => {
-              console.log(err);
-            });
-          }
-        }).catch((err) => {
-          console.log(err);
-        });
+        
+        if (file != ""){
+          $http({
+            url: '/exist',
+            method: 'GET',
+            params: {file: file}
+          }).then(function(result){
+            console.log("file exist: " + result.data);
+            exist = result.data;
+            console.log("exist before download: " + exist);
+            //&& (i==0)
+            if ((result.data == true) && (i==0)){
+              console.log("you are here");
+              var link = document.getElementById('link');
+              link.target = "_self";
+              link.href = 'http://localhost:80/csv/' + file;
+              link.download = file;
+              i = 1;
+              link.click();
+            }
+            else if ((result.data == false) && (i==0)){
+              alert('file not created yet');
+            }
+          }).then(() => {
+            // (count==0) &&
+            console.log("exist: " + exist);
+            if (count==1){
+              exist=false;
+            }
+            if ((exist == true) && (count==0)) {
+              console.log("count: " + count);
+              var name = localStorage.getItem('finalFile');
+              console.log("name file: " +name);
+              if (count==0){
+                $http({
+                  url: '/delete',
+                  method: 'GET',
+                  params: {file: name}
+                }).then(() => {
+                  localStorage.setItem('finalFile', "");
+                }).catch((err) => {
+                  console.log(err);
+                });
+              }
+              count = 1;
+            }
+          }).catch((err) => {
+            console.log(err);
+          });
+        }
       }
     }]);
-
-    function downloadComplete(){
-      var file = localStorage.getItem('finalFile');
-      var iframe = document.getElementById('my_iframe');
-      iframe.src = 'http://localhost:80/csv/' + file;
-      return true;
-    }
-
 }());
