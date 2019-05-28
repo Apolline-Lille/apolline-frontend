@@ -273,13 +273,11 @@
             console.log("file exist: " + result.data);
             exist = result.data;
             console.log("exist before download: " + exist);
-            //&& (i==0)
             if ((result.data == true) && (i==0)){
               console.log("you are here");
               var link = document.getElementById('link');
               link.target = "_self";
               link.href = 'http://localhost:80/csv/' + file;
-              link.download = file;
               i = 1;
               link.click();
             }
@@ -287,7 +285,6 @@
               alert('file not created yet');
             }
           }).then(() => {
-            // (count==0) &&
             console.log("exist: " + exist);
             if (count==1){
               exist=false;

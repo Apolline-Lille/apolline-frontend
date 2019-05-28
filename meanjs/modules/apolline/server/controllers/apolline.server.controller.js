@@ -58,8 +58,7 @@ exports.exist = function exist(req,res,next){
 exports.removeFile = function removeFile(req, res, next){
   var fileToRemove = req.query.file;
   console.log("fileToRemove " + fileToRemove);
-  ApollineDelete.removeFile(fileToRemove)
-    .then(function (response){
+  ApollineDelete.removeFile(fileToRemove).then(function (response){
       console.log("file deleted: " + response);
     }).catch (function (response){
       console.error(response);
