@@ -7,14 +7,8 @@
 # Compose:
 # docker-compose up -d
 
-FROM alpine:3.9
+FROM alpine:3.9 AS build
 MAINTAINER MEAN.JS
-
-# 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
-EXPOSE 3000 443 80 35729 8080
-
-# Set development environment as default
-ENV NODE_ENV development
 
 # Install Utilities
 RUN apk --no-cache update \
@@ -24,7 +18,6 @@ RUN apk --no-cache update \
 && apk --update add --no-cache --virtual git \
 && apk --update add --no-cache --virtual ssh \
 && apk --update add --no-cache --virtual gcc \
-#&& apk --update add --no-cache --virtual make \
 && apk --update add --no-cache --virtual build-essential \
 && apk --update add --no-cache --virtual libkrb5 \
 && apk --update add --no-cache --virtual sudo \
@@ -59,7 +52,6 @@ RUN sudo npm install --quiet -g gulp \
   fs \
   zlib \
   pngquant \
-  autoreconf \
   && npm cache clean --force
 RUN npm update
 
@@ -82,6 +74,16 @@ COPY .bowerrc /opt/mean.js/.bowerrc
 RUN bower install --quiet --allow-root --config.interactive=false
 
 COPY . /opt/mean.js
+
+FROM alpine:3.9
+# 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
+EXPOSE 3000 443 80 35729 8080
+# Set development environment as default
+ENV NODE_ENV development
+WORKDIR /opt/mean.js
+COPY --from=build /opt/mean.js/node_modules node_modules
+
+USER node
 
 # Run MEAN.JS server
 CMD apk install && apk start
