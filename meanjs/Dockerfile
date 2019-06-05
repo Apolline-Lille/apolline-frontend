@@ -7,7 +7,7 @@
 # Compose:
 # docker-compose up -d
 
-FROM ubuntu:18.04
+FROM alpine:3.9
 MAINTAINER MEAN.JS
 
 # 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
@@ -17,31 +17,50 @@ EXPOSE 3000 443 80 35729 8080
 ENV NODE_ENV development
 
 # Install Utilities
-RUN apt-get update -q  \
- && apt-get install -yqq \
- npm \
- curl \
- git \
- ssh \
- gcc \
- make \
- build-essential \
- libkrb5-dev \
- sudo \
- apt-utils \
- libpng-dev \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+RUN apk --no-cache update \
+&& apk --no-cache add --no-cache --virtual yqq \
+&& apk --update add --no-cache --virtual npm \
+&& apk --update add --no-cache --virtual curl \
+&& apk --update add --no-cache --virtual git \
+&& apk --update add --no-cache --virtual ssh \
+&& apk --update add --no-cache --virtual gcc \
+#&& apk --update add --no-cache --virtual make \
+&& apk --update add --no-cache --virtual build-essential \
+&& apk --update add --no-cache --virtual libkrb5 \
+&& apk --update add --no-cache --virtual sudo \
+&& apk --update add --no-cache --virtual apt-utils \
+&& apk --update add --no-cache --virtual g++ \
+&& apk --update add --no-cache --virtual make \
+&& apk --update add --no-cache --virtual bash \
+&& apk --update add --no-cache --virtual zlib \
+&& apk --update add --no-cache --virtual libpng-dev \
+&& rm -fr /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Install nodejs
-RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
-RUN sudo apt-get install -yq nodejs \
- && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - 
+RUN sudo apk --update add nodejs \
+ #&& apk clean \
+ && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
 
 # Install MEAN.JS Prerequisites
-RUN npm install --quiet -g gulp bower yo mocha karma-cli pm2 js-yaml connect swagger-tools express path http fs zlib worker-nodes && npm cache clean --force
+RUN sudo npm install --quiet -g gulp \
+ bower \
+  yo \ 
+  mocha \
+  karma-cli \
+  pm2 \
+  js-yaml \
+  connect \
+  swagger-tools \
+  express \
+  path \
+  http \
+  fs \
+  zlib \
+  pngquant \
+  autoreconf \
+  && npm cache clean --force
 RUN npm update
 
 RUN mkdir -p /opt/mean.js/public/lib
@@ -53,7 +72,8 @@ WORKDIR /opt/mean.js
 # when the local package.json file changes.
 # Install npm packages
 COPY package.json /opt/mean.js/package.json
-RUN npm install --quiet
+RUN sudo npm install
+RUN sudo npm audit fix
 RUN npm cache clean --force
 
 # Install bower packages
@@ -64,6 +84,6 @@ RUN bower install --quiet --allow-root --config.interactive=false
 COPY . /opt/mean.js
 
 # Run MEAN.JS server
-CMD npm install && npm start
+CMD apk install && apk start
 
 
