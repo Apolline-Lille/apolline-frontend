@@ -6,29 +6,29 @@
 
 This frontend app will allow the user to download CSV file with data from the air quality's InfluxDB database. We are using here a MeanJS boilerplate. MEAN is the acronym of MongoDB, Express, AngularJS and NodeJS and it is a strong starting point for apps which use this base.
 
-#### Explications of the modules
+### Explications of the modules
 
-##### Module Apolline:
+#### Module Apolline:
 
-###### client:
+##### client:
 
 Don't really use in the app the main client part in the app is in the core module.
 
-###### server:
+##### server:
 
-####### controller:
+###### controller:
 
 Set the main server controller functions to create, delete and find the different CSV files.
 
-####### policies:
+###### policies:
 
 Set the permissions in the app for different users, every users are allowed to use all the features.
 
-####### routes:
+###### routes:
 
 Set the route of the controller functions.
 
-####### service:
+###### service:
 
 The files that contains the code for the different services.
 
@@ -36,25 +36,25 @@ The files that contains the code for the different services.
 * apolline-exist.server.service.js : the service which allows the users to check if the choosen compressed CSV file exists.
 * apolline-getdata.server.service.js : this service creates the CSV and compress it.
 
-####### utils
+###### utils
 
 The file write.js send the data and the response to the client.
 
-#### Module Core:
+### Module Core:
 
-##### client:
+#### client:
 
 This directory contains all the files from the frontend (HTML view, angularjs).
 
-###### controller:
+##### controller:
 
-####### home.client.controller.js:
+###### home.client.controller.js:
 
 The JavaScript file for the main view home.client.view.html .
 
-###### services:
+##### services:
 
-####### worker.client.service.js:
+###### worker.client.service.js:
 
 The JavaScript Worker which is used to communicate with the server to create the compressed CSV file.
 
