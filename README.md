@@ -69,6 +69,12 @@ Make sure you have installed all of the following prerequisites on your developm
 * MongoDB: [Download & Install MongoDB](http://www.mongodb.org/downloads)
 * Bower (Manage your frontend packages)
 
+Installation of npm:
+
+```bash
+npm install npm -g
+```
+
 You can install Bower by using the following command but be sure you have installed NodeJS and npm (Node Package Manager):
 
 ```bash
