@@ -82,7 +82,7 @@ meanjs      | MEAN.JS version: 0.6.0
 To deploy the app:
 ```bash
 $ git clone https://github.com/Apolline-Lille/apolline-frontend.git --config core.autocrlf=input
-$ cd meanjs
+$ cd apolline-frontend/meanjs
 ```
 Then build the image:
 ```bash
