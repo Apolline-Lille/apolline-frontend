@@ -21,54 +21,28 @@ You can install Bower by using the following command but be sure you have instal
 $ npm install -g bower
 ```
 
-### Downloading the Apolline-Frontend app
+### Deploy the app
 
-You can get the whole code by cloning the Apolline-Frontend Repository:
-
-```bash
-$ git clone https://github.com/Apolline-Lille/apolline-frontend.git
-```
-
-### Install the dependencies
-Once you cloned the app go into the directory where the app is, and then go to into the the directory named /meanjs:
+#### Download the app and go to the directory:
 
 ```bash
-$ cd apolline-frontend/meanjs
-```  
-
-Now we have to install all the dependencies by just writing: 
-
-```bash
-$ npm install
-``` 
-
-This command install all the dependencies needed for the application. When the npm packages install process is over, npm will initiate a bower install command to install all the front-end modules needed for the application
-You can update these packages by using:
-
-```bash
-$ npm update
-``` 
-
-### Building the docker image and running the application
-Go to the directory meanjs in the apolline-frontend app:
-
-```bash
+$ git clone https://github.com/Apolline-Lille/apolline-frontend.git --config core.autocrlf=input
 $ cd apolline-frontend/meanjs
 ```
-
-You have to build the docker image:
+#### Build the image:
 
 ```bash
 $ docker build -t meanjs .
 ```
-Once you build it write:
+#### Run the container:
 
 ```bash
 $ docker-compose up
 ```
 This final command launch your app and finally you can go to the http://localhost:80/ in your browser to see the application.
 
-To get the CSV and the data, once the bash show:
+####Once the bash show this, you can use the apolline frontend app:
+
 ```bash
 meanjs      | MEAN.JS - Development Environment
 meanjs      | 
@@ -77,19 +51,5 @@ meanjs      | Server:          http://0.0.0.0:80
 meanjs      | Database:        mongodb://db/mean-dev
 meanjs      | App version:     0.6.0
 meanjs      | MEAN.JS version: 0.6.0
-```
-
-To deploy the app:
-```bash
-$ git clone https://github.com/Apolline-Lille/apolline-frontend.git --config core.autocrlf=input
-$ cd apolline-frontend/meanjs
-```
-Then build the image:
-```bash
-$ docker build -t meanjs .
-```
-And run the container:
-```bash
-$ docker-compose up
 ```
 

@@ -7,7 +7,7 @@
 # Compose:
 # docker-compose up -d
 
-FROM alpine:3.9
+FROM alpine:3.9 AS alpine
 MAINTAINER MEAN.JS
 
 # 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
@@ -38,7 +38,7 @@ RUN apk --no-cache update \
 && rm -fr /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Install nodejs
-#RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash - 
+#RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 RUN sudo apk add --update nodejs \
  #&& apk clean \
  && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
