@@ -8,8 +8,6 @@
         $scope.init = function(){
             var listMeasurement = localStorage.getItem("selectedMeasurement");
             var campaign = localStorage.getItem("currentDB");
-            console.log("list measurement choose " + listMeasurement);
-            console.log("campaign: " + campaign);
             $scope.chooseMeasurement = listMeasurement;
                 for (var measurement in listMeasurement){
                     var request = encodeURIComponent("SHOW TAG KEYS FROM \"" + measurement + "\"");

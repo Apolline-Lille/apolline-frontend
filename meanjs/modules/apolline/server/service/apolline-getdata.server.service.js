@@ -18,7 +18,6 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
     await stream.write(tagsCSV + "\n");
     return new Promise(async (resolve, reject) => {
         await asyncForEach(listURL, async(urlMeasurement) => {
-            console.log(urlMeasurement);
             await getDataFromMeasurement(urlMeasurement, stream);
         });
         await stream.on("finish", async function() {
@@ -44,7 +43,6 @@ exports.getData = async(listURL, tagsCSV, nameFile) => {
     });
 }
 const getDataFromMeasurement = async (url, stream) => {
-    console.log("getDataFromMeasurement");
   return new Promise((resolve, reject) => {
     var request = http.get(url, (res) => {
         const { statusCode } = res;
@@ -84,11 +82,9 @@ const getDataFromMeasurement = async (url, stream) => {
                     await stream.write(dataLine + "\n");
                     await stream.write("");
                 });
-                console.log("before the end");
                 resolve(stream.write(""));
                 request.end();
             } catch (e) {
-                console.log("erreur resolve");
                 console.error(e.message);
             }
         });

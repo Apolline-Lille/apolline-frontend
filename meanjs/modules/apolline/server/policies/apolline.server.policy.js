@@ -15,9 +15,6 @@ exports.invokeRolesPolicies = function () {
   acl.allow([{
     roles: ['admin'],
     allows: [{
-      resources: '/measurements/:campaign',
-      permissions: '*'
-    },{
       resources: '/measurements/:campaign/data',
       permissions: '*'
     },{
@@ -30,9 +27,6 @@ exports.invokeRolesPolicies = function () {
   }, {
     roles: ['user'],
     allows: [{
-      resources: '/measurements/:campaign',
-      permissions: '*'
-    },{
       resources: '/measurements/:campaign/data',
       permissions: '*'
     },{
@@ -45,9 +39,6 @@ exports.invokeRolesPolicies = function () {
   }, {
     roles: ['guest'],
     allows: [{
-      resources: '/measurements/:campaign',
-      permissions: '*'
-    },{
       resources: '/measurements/:campaign/data',
       permissions: '*'
     },{

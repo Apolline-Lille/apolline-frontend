@@ -32,17 +32,6 @@
                 });
         };
         console.log(urlMeasurement);
-        /*$http.get(urlMeasurement.toString()).then(function successCallback(response){
-            console.log('hello');
-            (response.data.results[0].series[0].values).forEach(element => {
-                listMeasurements.push(element[0]);
-            });
-            console.log(listMeasurements);
-            $scope.checkboxMeasurement = listMeasurements;
-            return listMeasurements;
-        }), function errorCallback(response){
-            console.log(response)
-        };*/
 
         $scope.onClick = function(){
             var checkboxes =  document.getElementsByClassName('measurementValue');
