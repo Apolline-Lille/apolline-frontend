@@ -78,8 +78,18 @@ meanjs      | Database:        mongodb://db/mean-dev
 meanjs      | App version:     0.6.0
 meanjs      | MEAN.JS version: 0.6.0
 ```
-Open a new console and write:
+
+To deploy the app:
 ```bash
-curl http://0.0.0.0:80/measurements/loa
+$ git clone https://github.com/Apolline-Lille/apolline-frontend.git --config core.autocrlf=input
+$ cd meanjs
+```
+Then build the image:
+```bash
+$ docker build -t meanjs .
+```
+And run the container:
+```bash
+$ docker-compose up
 ```
 
