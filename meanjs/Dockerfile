@@ -7,13 +7,8 @@
 # Compose:
 # docker-compose up -d
 
-FROM alpine:3.9 AS alpine
+FROM alpine:3.9 AS base
 MAINTAINER MEAN.JS
-
-# 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
-EXPOSE 3000 443 80 35729 8080
-
-USER root
 
 # Set development environment as default
 ENV NODE_ENV development
@@ -38,11 +33,23 @@ RUN apk --no-cache update \
 && rm -fr /var/cache/apk/* /tmp/* /var/tmp/*
 
 # Install nodejs
-#RUN curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 RUN sudo apk add --update nodejs \
- #&& apk clean \
  && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
 
+WORKDIR /opt/mean.js
+
+# Copies the local package.json file to the container
+# and utilities docker container cache to not needing to rebuild
+# and install node_modules/ everytime we build the docker, but only
+# when the local package.json file changes.
+# Install npm packages
+COPY package.json /opt/mean.js/package.json
+RUN npm install
+RUN npm cache clean --force
+
+COPY . /opt/mean.js
+
+FROM base AS dependencies
 
 # Install MEAN.JS Prerequisites
 RUN sudo npm install --unsafe-perm --quiet -g natives \
@@ -61,27 +68,23 @@ RUN sudo npm install --unsafe-perm --quiet -g natives \
   fs \
   zlib \
   pngquant \
+  gulp-update \
   && npm cache clean --force
 RUN npm update
-RUN npm install gulp-update
+RUN npm install
 RUN mkdir -p /opt/mean.js/public/lib
 WORKDIR /opt/mean.js
 
-# Copies the local package.json file to the container
-# and utilities docker container cache to not needing to rebuild
-# and install node_modules/ everytime we build the docker, but only
-# when the local package.json file changes.
-# Install npm packages
-COPY package.json /opt/mean.js/package.json
-RUN npm install
-RUN npm cache clean --force
 
 # Install bower packages
 COPY bower.json /opt/mean.js/bower.json
 COPY .bowerrc /opt/mean.js/.bowerrc
 RUN bower install --quiet --allow-root --config.interactive=false
 
-COPY . /opt/mean.js
+# 3000 = HTTP, 443 = HTTPS, 80 = MEAN.JS server, 35729 = livereload, 8080 = node-inspector
+EXPOSE 3000 443 80 35729 8080
+
+USER root
 
 # Run MEAN.JS server
 CMD npm install && npm start
