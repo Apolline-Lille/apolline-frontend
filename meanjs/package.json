@@ -45,7 +45,7 @@
     "@angular/router": "^7.2.15",
     "acl": "^0.4.11",
     "amazon-s3-uri": "0.0.3",
-    "async": "~2.5.0",
+    "async": "~3.2.2",
     "aws-sdk": "^2.469.0",
     "body-parser": "^1.19.0",
     "bower": "^1.8.8",
