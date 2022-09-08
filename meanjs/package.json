@@ -83,7 +83,7 @@
     "influx": "^5.1.0",
     "jasmine-core": "~2.7.0",
     "jsonexport": "^2.4.1",
-    "jszip": "^3.2.1",
+    "jszip": "^3.7.0",
     "lodash": "^4.17.11",
     "lusca": "^1.5.2",
     "method-override": "^2.3.10",
